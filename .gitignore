@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.db
+
+# Node
+node_modules/
+dist/
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Archivos subidos por usuarios
+storage/
+
+# Editor / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
