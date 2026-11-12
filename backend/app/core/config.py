@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     secret_key: str = "dev-inseguro-cambiar-en-produccion"
     cors_origins: list[str] = ["http://localhost:5173"]
     ai_provider: str = "claude"  # claude | ollama
+    admin_correo: str | None = None
+    admin_contrasena: str | None = None
 
 
 @lru_cache

@@ -9,7 +9,7 @@ Una fila solo pasa a ✅ cuando su criterio de aceptación se comprobó (prueba 
 |----|-----------|------------------------|--------|
 | RF-01 | Entrada por laboratorio: descripción/objetivos, rúbrica y solución del estudiante | Un laboratorio no puede evaluarse si falta alguno de los tres elementos | ⬜ |
 | RF-02 | Portafolio académico por estudiante, cohorte (1 y 2) y laboratorio | Cada entrega guarda PDF con texto legible, código (URL GitHub o ZIP) y rúbrica; video/presentación opcionales | ⬜ |
-| RF-03 | Asociar cada evidencia a su actividad y conservar la versión de rúbrica usada | Editar una rúbrica crea versión nueva; evaluaciones antiguas siguen apuntando a la versión original | ⬜ |
+| RF-03 | Asociar cada evidencia a su actividad y conservar la versión de rúbrica usada | Editar una rúbrica crea versión nueva; evaluaciones antiguas siguen apuntando a la versión original | 🟨 tabla `rubrica_versiones` inmutable y entregas ligadas a versión; falta la API |
 | RF-04 | Gestión de rúbricas: cargar, interpretar (IA) y parametrizar competencias, criterios, descriptores, niveles y ponderaciones | Rúbrica cargada desde PDF/texto queda estructurada y editable en la UI | ⬜ |
 | RF-05 | Validación de rúbricas | Detecta pesos ≠ 100 %, niveles sin descriptor, criterios sin competencia, escalas incoherentes; bloquea evaluación hasta corregir | 🟨 validador listo y probado; falta bloquear en el flujo de evaluación |
 | RF-06 | Evaluación inteligente por criterio con evidencias citadas | Cada criterio tiene nivel, evidencias concretas (archivo/página/línea), justificación, fortalezas, debilidades, recomendaciones | ⬜ |
@@ -28,8 +28,8 @@ Una fila solo pasa a ✅ cuando su criterio de aceptación se comprobó (prueba 
 | RNF-03 | Verificación objetiva del código: sintaxis, análisis estático, pruebas | Resultados de lint/pruebas forman parte de la evidencia de la evaluación | ⬜ |
 | RNF-04 | Sandbox: aislado, sin red, límites de recursos y tiempo | Prueba que demuestre que código malicioso (red, fork bomb, bucle infinito) es contenido | ⬜ |
 | RNF-05 | Proveedor de IA configurable (local o nube), justificado con requisitos, límites y costos | Cambiar de proveedor solo requiere configuración; costos documentados | ⬜ |
-| RNF-06 | Despliegue con URL pública, autenticación, gestión de usuarios, persistencia y almacenamiento seguro | URL accesible; roles (admin, docente, estudiante); archivos fuera de la raíz pública | ⬜ |
-| RNF-07 | Trazabilidad por evaluación | Se guarda: evidencias, versión de rúbrica, modelo/parámetros, resultados de pruebas, justificaciones, ajustes docentes | ⬜ |
-| RNF-08 | Protección de información académica | Un estudiante solo ve lo suyo y solo cuando está publicado | ⬜ |
+| RNF-06 | Despliegue con URL pública, autenticación, gestión de usuarios, persistencia y almacenamiento seguro | URL accesible; roles (admin, docente, estudiante); archivos fuera de la raíz pública | 🟨 auth JWT, roles, usuarios y PostgreSQL listos y probados en Docker; falta despliegue público |
+| RNF-07 | Trazabilidad por evaluación | Se guarda: evidencias, versión de rúbrica, modelo/parámetros, resultados de pruebas, justificaciones, ajustes docentes | 🟨 tablas `evaluaciones` y `auditoria` creadas; auditoría activa en usuarios |
+| RNF-08 | Protección de información académica | Un estudiante solo ve lo suyo y solo cuando está publicado | 🟨 control de acceso por rol en API y UI; falta aplicarlo al portafolio |
 | RNF-09 | Análisis multimodal (recomendado) | Texto/PDF y código obligatorios; imágenes/diagramas por modelo de visión; video/audio opcional | ⬜ |
 | RNF-10 | Calidad: arquitectura, usabilidad, estabilidad | Pruebas automatizadas pasando en CI; UI responsive | ⬜ |

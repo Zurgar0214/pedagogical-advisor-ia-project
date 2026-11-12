@@ -1,17 +1,27 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import type { Rol } from '../api/cliente'
+import { useAuth } from '../auth/contexto'
 import EstadoApi from './EstadoApi'
 
-const enlaces = [
-  { to: '/', texto: 'Proyecto', fin: true },
-  { to: '/portafolio', texto: 'Portafolio' },
-  { to: '/rubricas', texto: 'Rúbricas' },
-  { to: '/revision', texto: 'Revisión docente' },
-  { to: '/informe', texto: 'Informe' },
-  { to: '/mapa-mental', texto: 'Mapa mental' },
-  { to: '/login', texto: 'Iniciar sesión' },
+const TODOS: Rol[] = ['admin', 'docente', 'estudiante']
+const DOCENTES: Rol[] = ['admin', 'docente']
+const ETIQUETA_ROL: Record<Rol, string> = { admin: 'Administrador', docente: 'Docente', estudiante: 'Estudiante' }
+
+const enlaces: { to: string; texto: string; fin?: boolean; roles: Rol[] | null }[] = [
+  { to: '/', texto: 'Proyecto', fin: true, roles: null },
+  { to: '/portafolio', texto: 'Portafolio', roles: TODOS },
+  { to: '/rubricas', texto: 'Rúbricas', roles: DOCENTES },
+  { to: '/revision', texto: 'Revisión docente', roles: DOCENTES },
+  { to: '/informe', texto: 'Informe', roles: TODOS },
+  { to: '/mapa-mental', texto: 'Mapa mental', roles: TODOS },
+  { to: '/usuarios', texto: 'Usuarios', roles: ['admin'] },
 ]
 
 export default function Layout() {
+  const { usuario, cerrarSesion } = useAuth()
+  const navegar = useNavigate()
+  const visibles = enlaces.filter((e) => e.roles === null || (usuario !== null && e.roles.includes(usuario.rol)))
+
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#contenido" className="sr-only focus:not-sr-only focus:absolute focus:m-2 focus:bg-white focus:p-2">
@@ -25,7 +35,7 @@ export default function Layout() {
           </div>
           <nav aria-label="Principal">
             <ul className="flex flex-wrap gap-1">
-              {enlaces.map((e) => (
+              {visibles.map((e) => (
                 <li key={e.to}>
                   <NavLink
                     to={e.to}
@@ -42,6 +52,33 @@ export default function Layout() {
               ))}
             </ul>
           </nav>
+          <div className="flex items-center gap-3 text-sm">
+            {usuario ? (
+              <>
+                <p className="leading-tight">
+                  <span className="block font-medium">{usuario.nombre}</span>
+                  <span className="block text-xs text-blue-100">{ETIQUETA_ROL[usuario.rol]}</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    cerrarSesion()
+                    navegar('/login')
+                  }}
+                  className="rounded border border-white/60 px-3 py-1.5 font-medium hover:bg-white/15 focus:outline-2 focus:outline-white"
+                >
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <NavLink
+                to="/login"
+                className="rounded border border-white/60 px-3 py-1.5 font-medium hover:bg-white/15 focus:outline-2 focus:outline-white"
+              >
+                Iniciar sesión
+              </NavLink>
+            )}
+          </div>
         </div>
       </header>
       <main id="contenido" className="flex-1">

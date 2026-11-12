@@ -59,6 +59,8 @@ laboratorios reales y comparar calidad y costo por evaluación completa. El resu
 |-------|----------|--------------|--------|
 | 2026-11-12 | Desarrollo con harness orquestador + subagentes (ver HARNESS.md) | Una sola sesión | Ahorro de tokens y trabajo en paralelo por componente |
 | 2026-11-12 | Stack: FastAPI + Pydantic v2 + PostgreSQL + React (Vite) + Docker Compose en VPS | Next.js, Django, PaaS | Pydantic exigido; Docker necesario para el sandbox; un solo servidor simplifica el despliegue |
+| 2026-11-12 | Errores de validación responden 400 (no 422 de FastAPI) con `detail` en español | 422 por defecto | Contrato único y legible para el frontend |
+| 2026-11-12 | Token JWT en `sessionStorage` del navegador | Cookie httpOnly | Prototipo simple; revisar antes de producción |
 
 ## Equipo (RF-11)
 
@@ -72,3 +74,18 @@ laboratorios reales y comparar calidad y costo por evaluación completa. El resu
 - Proveedor de IA por defecto y presupuesto de API.
 - Foto del integrante para RF-11.
 - Laboratorios reales de cohortes 1 y 2 para pruebas (con sus rúbricas).
+
+## Modelo de datos (v1)
+
+| Tabla | Campos clave | Notas |
+|-------|--------------|-------|
+| `usuarios` | id, nombre, correo (único), hash_contrasena (argon2), rol, activo, creado_en | Roles: admin, docente, estudiante |
+| `laboratorios` | id, cohorte (1 o 2), codigo (único), titulo, descripcion, objetivos, temas (JSON) | Elemento 1 de RF-01 |
+| `rubricas` | id, laboratorio_id | Una rúbrica lógica por laboratorio |
+| `rubrica_versiones` | id, rubrica_id, numero, contenido (JSON con el esquema `Rubrica`), valida, inconsistencias (JSON), creado_por, creado_en | **Inmutables**: editar crea una versión nueva (RF-03) |
+| `entregas` | id, estudiante_id, laboratorio_id, rubrica_version_id, estado, creado_en | Única por (estudiante, laboratorio); conserva la versión de rúbrica usada |
+| `evidencias` | id, entrega_id, tipo, ruta_archivo o url, nombre_original, sha256, tamano_bytes, creado_en | Tipos: informe_pdf, codigo_zip, repo_github, video, presentacion, imagen |
+| `evaluaciones` | id, entrega_id, rubrica_version_id, estado, proveedor, modelo, parametros (JSON), resultado_ia (JSON), verificacion (JSON), nota_preliminar, nota_final, revisado_por, aprobado_en, publicado_en, creado_en | Estados: borrador → en_revision → aprobada → publicada (RNF-07) |
+| `auditoria` | id, usuario_id, accion, entidad, entidad_id, detalle (JSON), fecha | Ajustes docentes y acciones sensibles (RF-08) |
+
+Las migraciones se manejan con Alembic; el contenedor de la API aplica `alembic upgrade head` al arrancar.

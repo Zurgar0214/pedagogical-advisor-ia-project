@@ -4,3 +4,7 @@ extend-exclude = [".venv"]
 
 [lint]
 select = ["E", "F", "I", "UP", "B"]
+flake8-bugbear.extend-immutable-calls = ["fastapi.Depends"]
+
+[lint.per-file-ignores]
+"alembic/versions/*" = ["E501"]
