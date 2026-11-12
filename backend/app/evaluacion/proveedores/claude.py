@@ -23,7 +23,7 @@ from app.evaluacion.proveedores.base import (
 )
 
 MAX_TOKENS_SALIDA = 16_000
-ESFUERZO = {"evaluacion": "low", "escalamiento": "medium"}  # costo bajo; escalamiento piensa más
+ESFUERZO = {"evaluacion": "low", "escalamiento": "medium", "informe": "low"}  # costo bajo; escalamiento piensa más
 TIMEOUT_S = 180.0
 
 

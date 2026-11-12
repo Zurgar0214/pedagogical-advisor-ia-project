@@ -10,6 +10,7 @@ import re
 from app.core.config import Settings
 from app.evaluacion.contrato import UsoModelo
 from app.evaluacion.proveedores.base import BloqueTexto, ProveedorIA
+from app.informes.contrato import AgregadoInforme, SintesisInforme
 
 MODELO_FALSO = "falso-determinista-v1"
 CONFIANZA = 0.75
@@ -36,6 +37,43 @@ def _primera_linea_con_texto(cuerpo: str) -> tuple[int, str] | None:
     return None
 
 
+# El orden resuelve empates: lo más específico primero.
+_PALABRAS_CATEGORIA: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("Ética y responsabilidad en IA", ("ética", "etica", "sesgo", "equidad", "privacidad", "responsab")),
+    ("IA generativa y modelos de lenguaje", ("generativ", "llm", "prompt", "gpt", "difusión", "difusion")),
+    ("Procesamiento de lenguaje natural", ("lenguaje natural", "nlp", "texto", "token", "embedding")),
+    ("Visión por computador", ("visión", "vision", "imagen", "imágenes")),
+    ("Aprendizaje por refuerzo", ("refuerzo", "q-learning", "agente", "recompensa")),
+    (
+        "Redes neuronales y aprendizaje profundo",
+        ("neuronal", "profundo", "deep", "perceptr", "cnn", "rnn", "transformer"),
+    ),
+    (
+        "Aprendizaje no supervisado",
+        ("no supervisado", "cluster", "agrupa", "k-means", "kmeans", "pca", "dimensionalidad"),
+    ),
+    (
+        "Aprendizaje supervisado",
+        ("regresi", "clasificaci", "supervisado", "árbol", "arbol", "svm", "knn", "logística"),
+    ),
+    (
+        "Datos y evaluación de modelos",
+        ("evaluación", "evaluacion", "métrica", "metrica", "validación", "validacion", "sobreajuste", "datos"),
+    ),
+    ("Búsqueda y optimización", ("búsqueda", "busqueda", "optimiz", "gradiente", "heurística", "genétic")),
+    ("Fundamentos de IA", ("fundamentos", "introducción", "introduccion", "historia", "lógica")),
+)
+MAX_PASOS_PLAN_FALSO = 5
+
+
+def categoria_por_palabras(tema: str) -> str:
+    t = tema.lower()
+    for categoria, palabras in _PALABRAS_CATEGORIA:
+        if any(p in t for p in palabras):
+            return categoria
+    return "Otros"
+
+
 class FalsoProveedor(ProveedorIA):
     nombre = "falso"
     acepta_imagenes = False
@@ -44,10 +82,79 @@ class FalsoProveedor(ProveedorIA):
         self.modelo_principal = MODELO_FALSO
         self.modelo_escalamiento = MODELO_FALSO
 
+    def _sintesis(self, texto: str, modelo: str, proposito: str):
+        agregado = AgregadoInforme.model_validate(_json_tag("datos_informe", texto, {}))
+        temas = [t.tema for t in agregado.temas]
+        clasif = [{"tema": t, "categoria": categoria_por_palabras(t)} for t in temas]
+        por_cat: dict[str, list[str]] = {}
+        for c in clasif:
+            por_cat.setdefault(c["categoria"], []).append(c["tema"])
+        relaciones = [
+            {
+                "origen": a,
+                "destino": b,
+                "tipo": "complementa",
+                "explicacion": f"[Demostración] Ambos temas pertenecen a la categoría '{cat}'.",
+            }
+            for cat, ts in por_cat.items()
+            for a, b in zip(ts, ts[1:], strict=False)
+        ][:30]
+        plan = [
+            {
+                "prioridad": min(i + 1, 5),
+                "tema": b.nombre,
+                "objetivo": f"[Demostración] Cerrar la brecha en '{b.nombre}'.",
+                "actividades": [f"[Demostración] Repasar y practicar '{b.nombre}': {b.detalle}"[:300]],
+                "recursos": ["[Demostración] Material del curso"],
+                "indicador_logro": "[Demostración] Superar 3,5 en la próxima evaluación del tema.",
+                "plazo_semanas": 2 + i,
+            }
+            for i, b in enumerate(agregado.brechas[:MAX_PASOS_PLAN_FALSO])
+        ]
+        if not plan:
+            plan.append(
+                {
+                    "prioridad": 1,
+                    "tema": temas[0] if temas else "Consolidación general",
+                    "objetivo": "[Demostración] Consolidar lo aprendido sin brechas detectadas.",
+                    "actividades": ["[Demostración] Resolver un ejercicio integrador del curso."],
+                    "recursos": [],
+                    "indicador_logro": "[Demostración] Mantener el nivel actual.",
+                    "plazo_semanas": 4,
+                }
+            )
+        tendencia = f"{agregado.tendencia:+.1f}" if agregado.tendencia is not None else "no disponible"
+        cohortes = "; ".join(f"cohorte {k}: {v:.2f}" for k, v in sorted(agregado.promedio_cohorte.items()))
+        datos = {
+            "resumen": (
+                f"[Demostración, no es análisis de IA real] {agregado.estudiante}: promedio general "
+                f"{agregado.promedio_general:.1f} (nivel {agregado.nivel_general}) con "
+                f"{len(agregado.laboratorios)} de {agregado.laboratorios_totales} laboratorios evaluados."
+            ),
+            "evolucion": (
+                f"[Demostración, no es análisis de IA real] Promedios por cohorte: "
+                f"{cohortes or 'sin datos'}; tendencia: {tendencia}."
+            ),
+            "plan": plan,
+            "clasificacion": clasif,
+            "relaciones": relaciones,
+        }
+        salida = SintesisInforme.model_validate(datos)
+        uso = UsoModelo(
+            proveedor=self.nombre,
+            modelo=modelo,
+            proposito=proposito,
+            tokens_entrada=len(texto) // 4,
+            tokens_salida=len(json.dumps(datos, ensure_ascii=False)) // 4,
+        )
+        return salida, uso
+
     def generar_estructurado(self, sistema, bloques_estables, bloques_variables, esquema, modelo, proposito):
         texto = "\n\n".join(
             b.texto for b in [*bloques_estables, *bloques_variables] if isinstance(b, BloqueTexto)
         )
+        if esquema is SintesisInforme:
+            return self._sintesis(texto, modelo, proposito)
         rubrica = _json_tag("rubrica", texto, {"criterios": []})["criterios"]
         temas = _json_tag("temas", texto, [])
         verificacion = _json_tag("verificacion_tecnica", texto, {})

@@ -9,6 +9,7 @@ import Revision from './paginas/Revision'
 import Laboratorios from './paginas/Laboratorios'
 import Portafolio from './paginas/Portafolio'
 import RubricaEditor from './paginas/RubricaEditor'
+import Informe from './paginas/Informe'
 import Login from './paginas/Login'
 import MapaMental from './paginas/MapaMental'
 import Proyecto from './paginas/Proyecto'
@@ -32,7 +33,7 @@ export default function App() {
             path="informe"
             element={
               <RutaProtegida>
-                <Marcador titulo="Informe integral" requisito="RF-09" descripcion="Informe de aprendizaje de ambas cohortes, descargable en PDF." />
+                <Informe />
               </RutaProtegida>
             }
           />

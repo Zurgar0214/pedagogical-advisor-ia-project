@@ -164,3 +164,62 @@ Ambas las calcula el backend con `calcular_nota`. Al **estudiante** nunca se le 
 | `POST /api/evaluaciones/{id}/aprobar` | docente, admin | Solo desde `en_revision` → `aprobada`; fija `revisado_por` y `aprobado_en`. Auditado |
 | `POST /api/evaluaciones/{id}/publicar` | docente, admin | Solo desde `aprobada` → `publicada`. Auditado |
 | `GET /api/ia/configuracion` | docente, admin | `{proveedor, modelo_principal, modelo_escalamiento, umbral_confianza, disponible: bool, motivo}` sin secretos |
+
+---
+
+# Iteración 4: informe integral (RF-09) y mapa mental (RF-10)
+
+Interfaz interna: `backend/app/informes/contrato.py`. **Regla:** el informe y el mapa usan solo evaluaciones **publicadas**
+(la más reciente por entrega). Así lo que ve el docente y lo que ve el estudiante es lo mismo y nada sin aprobar se filtra.
+
+## Cómo agrega el backend (determinista)
+
+- Valor de un criterio = `valor` de su `nivel_final`. Promedio de competencia = promedio ponderado por `peso` de sus criterios en todas las evaluaciones.
+- Nivel de dominio = `nivel_por_valor(promedio)` (umbrales en el contrato).
+- Temas: unión de `laboratorio.temas` y `aprendizaje.tema`, normalizados (minúsculas, espacios simples). Promedio del tema: promedio de los `valor` finales de sus `criterios_relacionados`; si no hay, promedio de `VALOR_POR_NIVEL[nivel_dominio]` de sus aprendizajes. Temas de laboratorios sin evaluación publicada quedan con `nivel_dominio = null` y `laboratorios_sin_evidencia`.
+- Tendencia = promedio cohorte 2 − promedio cohorte 1 (`null` si falta alguna).
+- Brechas: competencias y temas en `inicial`/`basico`, criterios con valor final < 3,0 (indicando laboratorio), y temas sin evidencia.
+
+## Objeto Informe
+
+```json
+{ "id": 1, "estado": "listo", "error": null,
+  "estudiante": {"id": 2, "nombre": "...", "correo": "..."},
+  "generado_en": "...", "generado_por": {"id": 3, "nombre": "..."},
+  "evaluaciones_incluidas": [1, 4],
+  "agregado": AgregadoInforme,
+  "sintesis": SintesisInforme,
+  "temas_categoria": {"regresión": "Aprendizaje supervisado"},
+  "proveedor": "claude", "modelo": "claude-haiku-5-5", "version_prompt": "informe-v1",
+  "advertencias": [], "uso": [UsoModelo], "costo_usd_estimado": 0.002 }
+```
+Estados: `procesando` → `listo` | `error`. Al **estudiante** no se le envían `uso`, `costo_usd_estimado` ni `advertencias`.
+
+## Objeto Mapa (lo construye el backend desde el informe)
+
+```json
+{ "informe_id": 1, "estudiante": {"id": 2, "nombre": "..."},
+  "nodos": [
+    {"id": "raiz", "tipo": "raiz", "etiqueta": "Inteligencia Artificial", "nivel_dominio": "competente", "datos": {"promedio": 3.9}},
+    {"id": "cat:aprendizaje-supervisado", "tipo": "categoria", "etiqueta": "Aprendizaje supervisado", "nivel_dominio": "basico", "datos": {"promedio": 3.2, "temas": 2}},
+    {"id": "tema:regresion", "tipo": "tema", "etiqueta": "regresión", "nivel_dominio": "basico",
+     "datos": {"promedio": 3.2, "cohortes": [1], "laboratorios": ["C1-LAB01"], "aprendizajes": [AprendizajeLab], "que_fortalecer": ["..."], "sin_evidencia": false}},
+    {"id": "lab:C1-LAB01", "tipo": "laboratorio", "etiqueta": "C1-LAB01 · Regresión lineal", "nivel_dominio": null,
+     "datos": {"cohorte": 1, "nota_final": 4.1, "evaluacion_id": 1, "titulo": "..."}} ],
+  "aristas": [
+    {"id": "e1", "origen": "raiz", "destino": "cat:aprendizaje-supervisado", "tipo": "jerarquia", "etiqueta": ""},
+    {"id": "e2", "origen": "cat:aprendizaje-supervisado", "destino": "tema:regresion", "tipo": "jerarquia", "etiqueta": ""},
+    {"id": "e3", "origen": "tema:regresion", "destino": "lab:C1-LAB01", "tipo": "aplicado_en", "etiqueta": ""},
+    {"id": "e4", "origen": "tema:regresion", "destino": "tema:redes-neuronales", "tipo": "relacion", "etiqueta": "prerrequisito: ..."} ] }
+```
+Ids estables (slug sin tildes). Categorías sin temas no aparecen. Nivel de categoría y raíz = `nivel_por_valor` del promedio de sus temas con evidencia (`null` si ninguno).
+
+## Endpoints
+
+| Método y ruta | Rol | Notas |
+|---------------|-----|-------|
+| `POST /api/estudiantes/{id}/informes` | docente, admin, o el propio estudiante | 400 si no hay evaluaciones publicadas. Crea informe `procesando`, agrega y sintetiza en segundo plano. 202 → Informe. 409 si ya hay uno `procesando` |
+| `GET /api/estudiantes/{id}/informes` | docente, admin, propio estudiante (otro estudiante → 404) | Lista resumida (id, estado, generado_en, evaluaciones_incluidas, promedio_general), más reciente primero |
+| `GET /api/informes/{id}` | ídem | Informe completo (vista recortada para estudiante) |
+| `GET /api/informes/{id}/mapa` | ídem | Mapa (solo si `listo`, si no 409) |
+| `GET /api/informes/{id}/pdf` | ídem | PDF descargable (`attachment`) del informe `listo` |

@@ -63,6 +63,7 @@ laboratorios reales y comparar calidad y costo por evaluación completa. El resu
 | 2026-11-12 | Modelo principal Claude Haiku 5.5 y escalamiento a Sonnet 5.5 solo en criterios dudosos (confianza < 0,6, sin evidencias o nivel alto con errores de sintaxis) | Sonnet para todo; Gemini; solo Ollama | ~20 veces más barato; la calidad se compensa con escalamiento, cálculo de nota en backend y revisión docente. Pendiente medir con laboratorios reales |
 | 2026-11-12 | Proveedor `falso` determinista para pruebas y demos | Simular solo en pruebas | Permite demostrar el flujo completo sin clave ni costo |
 | 2026-11-12 | El contenido del estudiante se delimita y se trata como dato; los intentos de manipulación marcan la evaluación para revisión | Confiar en el modelo | Defensa contra inyección de prompts |
+| 2026-11-12 | El informe agrega solo evaluaciones publicadas; promedios, niveles de dominio (umbrales 2,5 / 3,5 / 4,3) y tendencia los calcula el backend; la IA redacta, propone el plan, clasifica temas en 12 categorías fijas y propone relaciones entre temas existentes | Que la IA calcule o invente temas | Mantiene la regla de oro 1 y evita nodos inventados en el mapa |
 | 2026-11-12 | Token JWT en `sessionStorage` del navegador | Cookie httpOnly | Prototipo simple; revisar antes de producción |
 
 ## Equipo (RF-11)

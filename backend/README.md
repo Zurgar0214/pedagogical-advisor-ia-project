@@ -72,6 +72,24 @@ El contenedor ejecuta `alembic upgrade head` antes de uvicorn (`entrypoint.sh`, 
   `advertencias`, `uso`, `costo_usd_estimado`) y tabla `ajustes_criterio`. Verificada upgrade/downgrade/upgrade en SQLite.
 - Pruebas: `tests/test_iteracion3.py` sustituye el pipeline con un doble (`monkeypatch` de `servicio.evaluar`), así que no depende de la IA.
 
+## Informe integral y mapa mental (Iteración 4: RF-09, RF-10)
+- Contrato en `docs/API.md` ("Iteración 4") e interfaz interna `app/informes/contrato.py`. Router `app/api/informes.py`;
+  orquestación en `app/services/informes.py`; modelo `Informe` (tabla `informes`, migración `0004`, verificada upgrade/downgrade/upgrade).
+- **Solo evaluaciones publicadas**, la más reciente por entrega (`evaluaciones_publicadas`). Los niveles finales se obtienen con
+  `services.evaluaciones.niveles_finales` (IA + último ajuste docente), la misma lógica de la vista de evaluación.
+- `app/informes/agregacion.py` (pura): promedio de competencia ponderado por `peso`, niveles con `nivel_por_valor` sobre el promedio ya
+  redondeado a 2 decimales (mitad hacia arriba), temas normalizados (minúsculas, espacios simples), tendencia, brechas. La IA nunca toca notas.
+- `app/informes/mapa.py` (pura): raíz -> categoría -> tema -> laboratorio; ids slug sin tildes (`cat:...`, `tema:...`, `lab:CODIGO`);
+  temas sin categoría o con categoría fuera de `CATEGORIAS_IA` van a «Otros»; relaciones de la IA solo entre temas existentes (sin duplicados ni autorrelaciones).
+- `app/informes/pdf.py`: `reportlab` (Helvetica, cubre tildes y ñ; los caracteres fuera de Latin-1 se sustituyen). Portada, resumen, notas,
+  competencias, gráfico de evolución, temas, brechas, plan y pie de IA.
+- `POST /api/estudiantes/{id}/informes` valida (400 sin publicadas, 409 si ya hay uno `procesando`), crea el informe `procesando` y encola
+  `ejecutar_informe` (`BackgroundTasks`, sesión propia). Llama a `app.evaluacion.informe.sintetizar`; error -> `error` con mensaje en español.
+  Auditoría: `informe_iniciado`, `informe_generado`, `informe_fallido`.
+- Estudiante: solo su informe (otro -> 404) y vista sin `uso`, `costo_usd_estimado` ni `advertencias`. Mapa y PDF devuelven 409 si el informe no está `listo`;
+  el PDF sale con `Content-Disposition: attachment`.
+- Pruebas: `tests/test_informes_puros.py` (agregación y mapa con datos a mano) y `tests/test_iteracion4.py` (API; `sintetizar` sustituido con un doble).
+
 ## Probar
 ```bash
 .venv/Scripts/python -m ruff check .
