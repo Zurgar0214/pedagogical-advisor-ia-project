@@ -1,6 +1,6 @@
 import { borrarToken, leerToken } from '../auth/token'
 
-const BASE: string = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api'
+export const BASE: string = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api'
 
 export type Rol = 'admin' | 'docente' | 'estudiante'
 
@@ -45,7 +45,7 @@ export function registrarSesionExpirada(fn: (() => void) | null): void {
   alSesionExpirada = fn
 }
 
-function extraerDetalle(cuerpo: unknown, respaldo: string): string {
+export function extraerDetalle(cuerpo: unknown, respaldo: string): string {
   if (cuerpo && typeof cuerpo === 'object' && 'detail' in cuerpo) {
     const d = (cuerpo as { detail: unknown }).detail
     if (typeof d === 'string') return d
@@ -62,7 +62,7 @@ function extraerDetalle(cuerpo: unknown, respaldo: string): string {
 export async function api<T>(ruta: string, opciones: RequestInit = {}): Promise<T> {
   const token = leerToken()
   const headers: Record<string, string> = { Accept: 'application/json' }
-  if (opciones.body !== undefined) headers['Content-Type'] = 'application/json'
+  if (opciones.body !== undefined && !(opciones.body instanceof FormData)) headers['Content-Type'] = 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
 
   let respuesta: Response
@@ -92,7 +92,7 @@ export async function api<T>(ruta: string, opciones: RequestInit = {}): Promise<
   return (await respuesta.json()) as T
 }
 
-const enviar = (metodo: string, cuerpo: unknown): RequestInit => ({ method: metodo, body: JSON.stringify(cuerpo) })
+export const enviar = (metodo: string, cuerpo: unknown): RequestInit => ({ method: metodo, body: JSON.stringify(cuerpo) })
 
 export const login = (correo: string, contrasena: string) =>
   api<RespuestaLogin>('/auth/login', enviar('POST', { correo, contrasena }))
@@ -115,4 +115,10 @@ export async function consultarSalud(): Promise<boolean> {
   } catch {
     return false
   }
+}
+
+/** Para clientes auxiliares (subida con XHR, descargas): trata un 401 autenticado como sesión expirada. */
+export function manejarSesionExpirada(): void {
+  borrarToken()
+  alSesionExpirada?.()
 }

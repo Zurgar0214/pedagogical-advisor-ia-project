@@ -10,7 +10,7 @@ const ETIQUETA_ROL: Record<Rol, string> = { admin: 'Administrador', docente: 'Do
 const enlaces: { to: string; texto: string; fin?: boolean; roles: Rol[] | null }[] = [
   { to: '/', texto: 'Proyecto', fin: true, roles: null },
   { to: '/portafolio', texto: 'Portafolio', roles: TODOS },
-  { to: '/rubricas', texto: 'Rúbricas', roles: DOCENTES },
+  { to: '/laboratorios', texto: 'Laboratorios', roles: DOCENTES },
   { to: '/revision', texto: 'Revisión docente', roles: DOCENTES },
   { to: '/informe', texto: 'Informe', roles: TODOS },
   { to: '/mapa-mental', texto: 'Mapa mental', roles: TODOS },

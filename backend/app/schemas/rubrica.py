@@ -23,6 +23,7 @@ class Competencia(BaseModel):
 class Criterio(BaseModel):
     id: str
     nombre: str
+    descripcion: str = ""
     competencia_id: str
     peso: float = Field(description="Peso porcentual (0-100)")
     niveles: list[NivelDesempeno] = Field(default_factory=list)

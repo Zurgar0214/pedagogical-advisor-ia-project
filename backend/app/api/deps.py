@@ -1,9 +1,12 @@
 """Dependencias de autenticación y autorización."""
 
+from pathlib import Path
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.seguridad import TokenInvalido, decodificar_token
 from app.db.session import get_db
 from app.models.enums import Rol
@@ -43,3 +46,8 @@ def requiere_rol(*roles: Rol):
         return usuario
 
     return dependencia
+
+
+def get_storage_dir() -> Path:
+    """Raíz del almacenamiento de evidencias (sustituible en pruebas)."""
+    return Path(get_settings().storage_dir)

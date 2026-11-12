@@ -8,3 +8,4 @@ flake8-bugbear.extend-immutable-calls = ["fastapi.Depends"]
 
 [lint.per-file-ignores]
 "alembic/versions/*" = ["E501"]
+"tests/*" = ["E501"]

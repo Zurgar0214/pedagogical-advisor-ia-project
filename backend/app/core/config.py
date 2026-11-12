@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./dev.db"
     secret_key: str = "dev-inseguro-cambiar-en-produccion"
     cors_origins: list[str] = ["http://localhost:5173"]
+    storage_dir: str = "./storage"
     ai_provider: str = "claude"  # claude | ollama
     admin_correo: str | None = None
     admin_contrasena: str | None = None

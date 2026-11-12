@@ -1,8 +1,12 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import AuthProvider from './auth/AuthProvider'
 import RutaProtegida from './auth/RutaProtegida'
 import Layout from './componentes/Layout'
 import Marcador from './componentes/Marcador'
+import Entrega from './paginas/Entrega'
+import Laboratorios from './paginas/Laboratorios'
+import Portafolio from './paginas/Portafolio'
+import RubricaEditor from './paginas/RubricaEditor'
 import Login from './paginas/Login'
 import MapaMental from './paginas/MapaMental'
 import Proyecto from './paginas/Proyecto'
@@ -15,22 +19,11 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<Proyecto />} />
           <Route path="login" element={<Login />} />
-          <Route
-            path="portafolio"
-            element={
-              <RutaProtegida>
-                <Marcador titulo="Portafolio" requisito="RF-01, RF-02, RF-03" descripcion="Entrega de laboratorios por estudiante, cohorte y actividad, con versionado de rúbrica." />
-              </RutaProtegida>
-            }
-          />
-          <Route
-            path="rubricas"
-            element={
-              <RutaProtegida roles={['docente', 'admin']}>
-                <Marcador titulo="Rúbricas" requisito="RF-04, RF-05" descripcion="Carga, interpretación, edición y validación de rúbricas." />
-              </RutaProtegida>
-            }
-          />
+          <Route path="portafolio" element={<RutaProtegida><Portafolio /></RutaProtegida>} />
+          <Route path="entregas/:id" element={<RutaProtegida><Entrega /></RutaProtegida>} />
+          <Route path="laboratorios" element={<RutaProtegida roles={['docente', 'admin']}><Laboratorios /></RutaProtegida>} />
+          <Route path="laboratorios/:id/rubrica" element={<RutaProtegida roles={['docente', 'admin']}><RubricaEditor /></RutaProtegida>} />
+          <Route path="rubricas" element={<Navigate to="/laboratorios" replace />} />
           <Route
             path="revision"
             element={
