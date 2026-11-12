@@ -60,6 +60,9 @@ laboratorios reales y comparar calidad y costo por evaluación completa. El resu
 | 2026-11-12 | Desarrollo con harness orquestador + subagentes (ver HARNESS.md) | Una sola sesión | Ahorro de tokens y trabajo en paralelo por componente |
 | 2026-11-12 | Stack: FastAPI + Pydantic v2 + PostgreSQL + React (Vite) + Docker Compose en VPS | Next.js, Django, PaaS | Pydantic exigido; Docker necesario para el sandbox; un solo servidor simplifica el despliegue |
 | 2026-11-12 | Errores de validación responden 400 (no 422 de FastAPI) con `detail` en español | 422 por defecto | Contrato único y legible para el frontend |
+| 2026-11-12 | Modelo principal Claude Haiku 5.5 y escalamiento a Sonnet 5.5 solo en criterios dudosos (confianza < 0,6, sin evidencias o nivel alto con errores de sintaxis) | Sonnet para todo; Gemini; solo Ollama | ~20 veces más barato; la calidad se compensa con escalamiento, cálculo de nota en backend y revisión docente. Pendiente medir con laboratorios reales |
+| 2026-11-12 | Proveedor `falso` determinista para pruebas y demos | Simular solo en pruebas | Permite demostrar el flujo completo sin clave ni costo |
+| 2026-11-12 | El contenido del estudiante se delimita y se trata como dato; los intentos de manipulación marcan la evaluación para revisión | Confiar en el modelo | Defensa contra inyección de prompts |
 | 2026-11-12 | Token JWT en `sessionStorage` del navegador | Cookie httpOnly | Prototipo simple; revisar antes de producción |
 
 ## Equipo (RF-11)

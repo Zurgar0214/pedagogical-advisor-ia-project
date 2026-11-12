@@ -14,6 +14,8 @@ import {
 } from '../api/iteracion2'
 import { botonPrim, botonSec, campo, formatoFecha, formatoTamano, mensajeError, tarjeta } from '../componentes/estilos'
 import { Aviso, Insignia } from '../componentes/ui'
+import PanelEvaluacion from '../componentes/PanelEvaluacion'
+import { useAuth } from '../auth/contexto'
 import { ETIQUETA_ESTADO, ETIQUETA_FALTANTE, TONO_ESTADO } from './estadoEntrega'
 
 const MB = 1024 * 1024
@@ -171,6 +173,7 @@ function ZonaRepo({ entregaId, deshabilitado, alCargar }: { entregaId: number; d
 
 export default function Entrega() {
   const { id } = useParams()
+  const { usuario } = useAuth()
   const entregaId = Number(id)
   const [entrega, setEntrega] = useState<TipoEntrega | null>(null)
   const [lab, setLab] = useState<Laboratorio | null>(null)
@@ -340,6 +343,13 @@ export default function Entrega() {
           ))}
         </section>
       </div>
+
+      <PanelEvaluacion
+        entregaId={entregaId}
+        estadoEntrega={entrega.estado}
+        esDocente={usuario?.rol === 'docente' || usuario?.rol === 'admin'}
+        alCambiar={() => void recargar()}
+      />
     </section>
   )
 }

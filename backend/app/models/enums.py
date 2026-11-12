@@ -19,7 +19,9 @@ class TipoEvidencia(StrEnum):
 
 
 class EstadoEvaluacion(StrEnum):
-    borrador = "borrador"
+    borrador = "borrador"  # valor heredado (iteración 1); el flujo actual no lo usa
+    procesando = "procesando"
     en_revision = "en_revision"
     aprobada = "aprobada"
     publicada = "publicada"
+    error = "error"

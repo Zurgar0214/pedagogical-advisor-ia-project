@@ -4,6 +4,8 @@ import RutaProtegida from './auth/RutaProtegida'
 import Layout from './componentes/Layout'
 import Marcador from './componentes/Marcador'
 import Entrega from './paginas/Entrega'
+import EvaluacionDetalle from './paginas/EvaluacionDetalle'
+import Revision from './paginas/Revision'
 import Laboratorios from './paginas/Laboratorios'
 import Portafolio from './paginas/Portafolio'
 import RubricaEditor from './paginas/RubricaEditor'
@@ -24,14 +26,8 @@ export default function App() {
           <Route path="laboratorios" element={<RutaProtegida roles={['docente', 'admin']}><Laboratorios /></RutaProtegida>} />
           <Route path="laboratorios/:id/rubrica" element={<RutaProtegida roles={['docente', 'admin']}><RubricaEditor /></RutaProtegida>} />
           <Route path="rubricas" element={<Navigate to="/laboratorios" replace />} />
-          <Route
-            path="revision"
-            element={
-              <RutaProtegida roles={['docente', 'admin']}>
-                <Marcador titulo="Revisión docente" requisito="RF-06, RF-07, RF-08" descripcion="Evaluación por criterio, nota preliminar y aprobación del docente." />
-              </RutaProtegida>
-            }
-          />
+          <Route path="revision" element={<RutaProtegida roles={['docente', 'admin']}><Revision /></RutaProtegida>} />
+          <Route path="evaluaciones/:id" element={<RutaProtegida><EvaluacionDetalle /></RutaProtegida>} />
           <Route
             path="informe"
             element={

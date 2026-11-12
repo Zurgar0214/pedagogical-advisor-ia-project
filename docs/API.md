@@ -115,3 +115,52 @@ El servidor recalcula `borrador`/`lista` al agregar o borrar evidencias. `faltan
 
 Almacenamiento: `STORAGE_DIR/entregas/<entrega_id>/<uuid4><ext>`; **nunca** se usa el nombre original en la ruta; se guarda SHA-256.
 El tamaño se controla mientras se lee el archivo (no confiar en `Content-Length`). Archivos fuera de cualquier ruta servida públicamente.
+
+---
+
+# Iteración 3: evaluación con IA y revisión docente (RF-06, RF-07, RF-08, RNF-02, RNF-03, RNF-07)
+
+Interfaz interna entre el pipeline y la API: `backend/app/evaluacion/contrato.py` (la define el orquestador).
+
+## Estados
+
+Evaluación: `procesando` → `en_revision` → `aprobada` → `publicada`; o `procesando` → `error`.
+Entrega: `lista` → `en_evaluacion` (mientras procesa) → `evaluada` (si termina bien) o vuelve a `lista` (si falla).
+
+## Objeto Evaluacion
+
+```json
+{ "id": 1, "entrega_id": 5, "estado": "en_revision", "error": null,
+  "estudiante": {"id": 2, "nombre": "..."}, "laboratorio": {"id": 1, "codigo": "...", "titulo": "...", "cohorte": 1},
+  "rubrica_version": {"id": 3, "numero": 2},
+  "proveedor": "claude", "modelo_principal": "claude-haiku-5-5", "version_prompt": "eval-v1",
+  "nota_preliminar": 3.8, "nota_final": 4.1,
+  "requiere_revision": false, "advertencias": [],
+  "criterios": [{
+      "criterio_id": "k1", "criterio": "Implementación", "competencia": "Modelado", "peso": 60,
+      "niveles_disponibles": [{"nombre": "...", "descriptor": "...", "valor": 5.0}],
+      "nivel_ia": "Competente", "nivel_final": "Sobresaliente", "valor_nivel_final": 5.0,
+      "confianza": 0.82, "justificacion": "...", "evidencias": [EvidenciaCitada],
+      "fortalezas": [], "debilidades": [], "recomendaciones": [], "modelo": "claude-haiku-5-5", "escalado": false,
+      "ajuste_docente": {"nivel": "Sobresaliente", "justificacion": "...", "usuario": {"id": 3, "nombre": "..."}, "fecha": "..."} }],
+  "resumen": "...", "fortalezas": [], "debilidades": [], "recomendaciones": [], "aprendizajes": [Aprendizaje],
+  "verificacion": VerificacionTecnica,
+  "uso": [UsoModelo], "costo_usd_estimado": 0.006,
+  "creado_en": "...", "revisado_por": {"id": 3, "nombre": "..."}, "aprobado_en": null, "publicado_en": null }
+```
+`nota_preliminar` = nota con los niveles de la IA; `nota_final` = nota con `nivel_final` (ajuste docente si existe, si no el de la IA).
+Ambas las calcula el backend con `calcular_nota`. Al **estudiante** nunca se le devuelven `uso`, `costo_usd_estimado`,
+`confianza`, `nivel_ia`, `nota_preliminar` ni `advertencias` (solo ve el resultado final publicado).
+
+## Endpoints
+
+| Método y ruta | Rol | Notas |
+|---------------|-----|-------|
+| `POST /api/entregas/{id}/evaluaciones` | docente, admin | Requiere entrega `lista` o `evaluada`. Crea evaluación `procesando`, pasa la entrega a `en_evaluacion` y lanza el pipeline en segundo plano. 202 → Evaluacion. 409 si ya hay una `procesando` o la entrega no está lista |
+| `GET /api/entregas/{id}/evaluaciones` | dueño, docente, admin | Más reciente primero. Estudiante: solo `publicada` |
+| `GET /api/evaluaciones?estado=` | docente, admin | Cola de revisión (por defecto `en_revision`), más antigua primero |
+| `GET /api/evaluaciones/{id}` | dueño (solo si `publicada`), docente, admin | 404 al estudiante en cualquier otro caso |
+| `PATCH /api/evaluaciones/{id}/criterios/{criterio_id}` | docente, admin | `{nivel, justificacion}` (justificación ≥ 10 caracteres). Solo en `en_revision`. Recalcula `nota_final`. Auditado |
+| `POST /api/evaluaciones/{id}/aprobar` | docente, admin | Solo desde `en_revision` → `aprobada`; fija `revisado_por` y `aprobado_en`. Auditado |
+| `POST /api/evaluaciones/{id}/publicar` | docente, admin | Solo desde `aprobada` → `publicada`. Auditado |
+| `GET /api/ia/configuracion` | docente, admin | `{proveedor, modelo_principal, modelo_escalamiento, umbral_confianza, disponible: bool, motivo}` sin secretos |

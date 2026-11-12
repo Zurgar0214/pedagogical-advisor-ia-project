@@ -50,6 +50,28 @@ El contenedor ejecuta `alembic upgrade head` antes de uvicorn (`entrypoint.sh`, 
 - Auditoría: laboratorio creado/editado, versión de rúbrica creada, entrega creada, evidencia cargada/eliminada.
 - Migración `0002`: `evidencias.texto_extraido` y `evidencias.detalle`; las entregas `pendiente` pasan a `borrador`.
 
+## Evaluaciones y revisión docente (Iteración 3: RF-06, RF-07, RF-08, RNF-07)
+- Contrato en `docs/API.md` ("Iteración 3"). Router `app/api/evaluaciones.py`; lógica en `app/services/evaluaciones.py`.
+  El pipeline de IA vive en `app/evaluacion/` (interfaz `contrato.py`); la API solo llama a `servicio.evaluar` y `servicio.estado_proveedor`.
+- `POST /api/entregas/{id}/evaluaciones` crea la evaluación `procesando` (202), pone la entrega en `en_evaluacion` y encola
+  `ejecutar_evaluacion` con `BackgroundTasks`. La tarea abre **su propia sesión** (`get_session_factory`, sustituible en pruebas),
+  arma el `ContextoEvaluacion` con la **versión de rúbrica fijada en la entrega** y rutas absolutas desde `STORAGE_DIR`, y persiste
+  resultado, verificación, uso, costo, proveedor, modelos, `version_prompt` y `parametros` (umbral y modelos). Pasa a `en_revision`
+  y la entrega a `evaluada`. Si hay `ErrorEvaluacion` o cualquier excepción: evaluación `error` (mensaje en español, sin trazas;
+  el detalle va al log) y la entrega vuelve a `lista`. Inicio y fin quedan en `auditoria`.
+- **La nota nunca viene del LLM**: `nota_preliminar` = `calcular_nota` con los niveles de la IA; `nota_final` = `calcular_nota` con
+  el nivel del último ajuste docente de cada criterio.
+- **Ajustes (RF-08)**: `PATCH .../criterios/{criterio_id}` valida que el nivel exista (400), justificación >= 10 caracteres (400),
+  solo en `en_revision` (409). Cada ajuste es una fila de `ajustes_criterio` (nivel anterior/nuevo, justificación, usuario, fecha):
+  el historial no se edita ni se borra; manda el último. También se audita. Flujo: `en_revision` -> `aprobar` -> `publicar`; fuera de orden, 409.
+- **Estudiante**: ve una evaluación solo si es suya y está `publicada` (si no, 404). Recibe una vista recortada
+  (`EvaluacionEstudiante`) sin `uso`, `costo_usd_estimado`, `confianza`, `nivel_ia`, `nota_preliminar`, `advertencias`,
+  `requiere_revision`, `error`, `modelo` ni `escalado` por criterio.
+- `GET /api/ia/configuracion` usa `estado_proveedor` (si falla, `disponible=false`) y nunca expone claves.
+- Migración `0003`: columnas nuevas en `evaluaciones` (`error`, `version_prompt`, `modelo_escalamiento`, `requiere_revision`,
+  `advertencias`, `uso`, `costo_usd_estimado`) y tabla `ajustes_criterio`. Verificada upgrade/downgrade/upgrade en SQLite.
+- Pruebas: `tests/test_iteracion3.py` sustituye el pipeline con un doble (`monkeypatch` de `servicio.evaluar`), así que no depende de la IA.
+
 ## Probar
 ```bash
 .venv/Scripts/python -m ruff check .

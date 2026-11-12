@@ -51,3 +51,10 @@ def requiere_rol(*roles: Rol):
 def get_storage_dir() -> Path:
     """Raíz del almacenamiento de evidencias (sustituible en pruebas)."""
     return Path(get_settings().storage_dir)
+
+
+def get_session_factory():
+    """Fábrica de sesiones para tareas en segundo plano (sustituible en pruebas)."""
+    from app.db.session import SessionLocal
+
+    return SessionLocal
