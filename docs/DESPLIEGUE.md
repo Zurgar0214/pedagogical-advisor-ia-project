@@ -1,7 +1,12 @@
-# Despliegue en Oracle Cloud "Always Free" (RNF-06)
+# Despliegue (RNF-06)
 
-Resultado: la plataforma completa (PostgreSQL, API, frontend y **sandbox con Docker**) publicada en
-`https://<tu-subdominio>.duckdns.org`, con HTTPS automático y sin costo.
+**Producción actual:** <https://asesor-ia-jvaron.northcentralus.cloudapp.azure.com>. Corre en Azure for Students:
+una máquina Standard_B2als_v2 (2 vCPU, 4 GiB, Ubuntu 24.04) en North Central US, por unos 0,0376 USD/h que salen del
+crédito de estudiante.
+
+La plataforma completa (PostgreSQL, API, frontend y **sandbox con Docker**) se publica con HTTPS automático.
+Los mismos archivos sirven en cualquier servidor Ubuntu con Docker; abajo están los pasos para **Azure for Students**
+(lo que se usó) y para **Oracle Cloud Always Free** (alternativa gratuita que no tuvo capacidad ARM en Bogotá).
 
 ```
 Internet ──443/80──► Caddy (HTTPS) ──► nginx (frontend + /api) ──► API FastAPI ──► PostgreSQL
@@ -25,6 +30,67 @@ Tiempo estimado: 30–45 minutos la primera vez.
 > Las pantallas de Oracle cambian a menudo; los nombres de menús pueden variar un poco.
 
 ---
+
+## A. Azure for Students (lo que se usó)
+
+1. En <https://portal.azure.com>, con el correo de la universidad: **Microsoft Azure for Students → Inicio**. Se
+   comprueba el crédito en **Education → Información general**: 100 USD por 12 meses y sin tarjeta.
+2. **Elegir región y tamaño permitidos.** Las suscripciones de estudiante bloquean muchos tamaños por región
+   (`NotAvailableForSubscription`). Para ver cuáles sirven, se abre Cloud Shell (`>_`, Bash) y se ejecuta:
+
+   ```bash
+   for r in eastus2 centralus southcentralus westus3 eastus northcentralus canadacentral brazilsouth mexicocentral; do echo "== $r"; az vm list-skus -l $r --resource-type virtualMachines --query "[?length(restrictions[?type=='Location'])==\`0\`].name" -o tsv | grep -E '^Standard_(B2s|B2ms|B1ms|B2als_v2|B2as_v2|B2ats_v2|D2als_v6|F2als_v6)$'; done
+   ```
+
+   En noviembre de 2026 solo **North Central US** ofrecía la serie B (B2als_v2: 4 GiB, unos 27 USD/mes). Las demás
+   regiones solo tenían D/F v6, que cuestan el doble.
+3. **Máquinas virtuales → Crear:**
+
+   | Campo | Valor |
+   |-------|-------|
+   | Grupo de recursos | `asesor-rg` (nuevo) |
+   | Nombre | `asesor-ia` |
+   | Región | North Central US |
+   | Imagen | Ubuntu Server 24.04 LTS – x64 Gen2 |
+   | Tamaño | Standard_B2als_v2 |
+   | Autenticación | Clave SSH, usuario `azureuser`, generar par de claves |
+   | Puertos de entrada | 22, 80, 443 |
+   | Disco | SSD estándar |
+   | Redes | Eliminar IP pública y NIC con la VM |
+   | Apagado automático | Desactivado |
+
+4. Se descarga `asesor-ia_key.pem` y se guarda **fuera de OneDrive** (`~\.ssh\`), con permisos solo para el usuario
+   (`icacls <ruta> /inheritance:r /grant:r "%USERNAME%:(R)"`).
+5. **IP pública → Configuración → Etiqueta de nombre DNS:** `asesor-ia-jvaron`. Así se obtiene
+   `asesor-ia-jvaron.northcentralus.cloudapp.azure.com` gratis, sin DuckDNS.
+6. Se instala y despliega con un solo comando desde el PC:
+
+   ```bash
+   ssh -t -i ~/.ssh/asesor-ia_key.pem azureuser@asesor-ia-jvaron.northcentralus.cloudapp.azure.com "git clone https://github.com/Zurgar0214/pedagogical-advisor-ia-project.git asesor && cd asesor && bash despliegue/desplegar.sh"
+   ```
+
+   El script pide el dominio, el correo del administrador y la clave de Anthropic (opcional), y muestra una sola vez
+   la contraseña del administrador.
+
+**Ahorro de crédito:** al **detener** la máquina desde el portal (estado *Desasignada*) no se cobra el cómputo, solo
+el disco y la IP (unos 6 USD/mes). Para la revisión se pulsa *Iniciar* y los contenedores arrancan solos
+(`restart: unless-stopped`).
+
+**Verificación hecha el 2026-11-16:**
+- `/api/salud` responde.
+- Certificado de Let's Encrypt válido.
+- HTTP redirige a HTTPS con 308.
+- Las cabeceras de seguridad están presentes.
+- Los puertos 5432, 8000, 8080, 8100 y 11434 están cerrados desde internet.
+- Sandbox ejecutada en el servidor: 3 pruebas, 1 pasa, 2 fallan; una de ellas por `Network is unreachable`.
+- No quedan contenedores huérfanos.
+
+---
+
+## B. Alternativa: Oracle Cloud "Always Free"
+
+Gratis de forma indefinida (ARM, hasta 4 OCPU y 24 GB), pero suele responder *Out of host capacity*. Para reintentar
+automáticamente desde Cloud Shell de Oracle está `despliegue/oracle_crear_vm.sh`.
 
 ## 1. Crear la cuenta de Oracle Cloud
 
@@ -127,10 +193,10 @@ cd ~/asesor && bash despliegue/desplegar.sh
 cd ~/asesor && docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f --tail=100 api caddy
 ```
 
-**Respaldo diario** a las 3:00 a. m. Abre el cron con `crontab -e` y añade esta línea:
+**Respaldo diario** a las 3:00 a. m. (`<usuario>` es `azureuser` en Azure y `ubuntu` en Oracle). Abre el cron con `crontab -e` y añade esta línea:
 
 ```
-0 3 * * * cd /home/ubuntu/asesor && bash despliegue/respaldar.sh >> respaldos.log 2>&1
+0 3 * * * cd /home/<usuario>/asesor && bash despliegue/respaldar.sh >> respaldos.log 2>&1
 ```
 
 Los respaldos quedan en `~/asesor/respaldos/`. Para llevarlos a tu PC:
