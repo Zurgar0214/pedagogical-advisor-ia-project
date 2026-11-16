@@ -1,0 +1,49 @@
+# Producción en un servidor (VPS / Oracle Cloud): Caddy delante con HTTPS automático (Let's Encrypt).
+# Se usa JUNTO al docker-compose.yml base:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Lo hace por ti `despliegue/desplegar.sh`. Guía completa: docs/DESPLIEGUE.md
+x-logs: &logs
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  db:
+    <<: *logs
+
+  api:
+    <<: *logs
+    # Permite usar un Ollama instalado en el mismo servidor (opcional, ver la guía).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  sandbox:
+    <<: *logs
+
+  web:
+    <<: *logs
+    # En producción solo Caddy publica puertos; nginx queda accesible únicamente en la red interna.
+    ports: !reset []
+
+  caddy:
+    <<: *logs
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMINIO: ${DOMINIO:?Define DOMINIO en .env (p. ej. asesor-ia.duckdns.org)}
+    volumes:
+      - ./despliegue/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  caddy_data:
+  caddy_config:

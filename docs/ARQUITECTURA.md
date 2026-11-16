@@ -69,6 +69,7 @@ laboratorios reales y comparar calidad y costo por evaluación completa. El resu
 | 2026-11-15 | Rúbricas por IA: la IA propone y no se guarda nada; el docente revisa en el editor y guarda una versión nueva que pasa por el validador | Guardar directamente | Supervisión humana y regla de oro 6 (pesos = 100 %) |
 | 2026-11-15 | Ollama con `num_ctx` explícito (16.384) y error si el prompt no cabe; con modelos locales se baja `IA_MAX_CARACTERES_CONTEXTO` a 40.000 | Contexto por defecto de Ollama | Ollama recorta el prompt en silencio y la evaluación saldría sin evidencias |
 | 2026-11-15 | Con PostgreSQL la API se niega a arrancar si `SECRET_KEY` o `SANDBOX_TOKEN` son de ejemplo o tienen menos de 32 caracteres | Solo documentarlo | Evita publicar con secretos conocidos |
+| 2026-11-15 | Despliegue en Oracle Cloud Always Free (ARM, Ubuntu) con Docker Compose + Caddy (HTTPS automático) y subdominio DuckDNS; guía en `docs/DESPLIEGUE.md` | Render/Railway/Fly.io; VPS de pago | Las PaaS no permiten lanzar contenedores (la sandbox quedaría desactivada) y su plan gratuito duerme y pierde archivos; Oracle da una VM completa gratis con Docker |
 | 2026-11-12 | Token JWT en `sessionStorage` del navegador | Cookie httpOnly | Prototipo simple; revisar antes de producción |
 
 ## Equipo (RF-11)
@@ -79,7 +80,6 @@ laboratorios reales y comparar calidad y costo por evaluación completa. El resu
 
 ## Pendientes de decidir
 
-- Hosting y dominio para la URL pública.
 - Proveedor de IA por defecto y presupuesto de API.
 - Foto del integrante para RF-11.
 - Laboratorios reales de cohortes 1 y 2 para pruebas (con sus rúbricas).

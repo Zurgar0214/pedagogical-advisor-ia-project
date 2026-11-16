@@ -1,0 +1,19 @@
+# Caddy obtiene y renueva solo el certificado HTTPS del dominio ($DOMINIO en .env).
+{$DOMINIO} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Igual que nginx (client_max_body_size 50m): evidencias de hasta 50 MB.
+	request_body {
+		max_size 50MB
+	}
+
+	reverse_proxy web:80
+}

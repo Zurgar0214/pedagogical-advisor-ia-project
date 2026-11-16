@@ -23,3 +23,6 @@ storage/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Respaldos del servidor (despliegue/respaldar.sh)
+respaldos/
