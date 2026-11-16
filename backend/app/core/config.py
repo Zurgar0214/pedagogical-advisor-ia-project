@@ -23,9 +23,42 @@ class Settings(BaseSettings):
     ia_umbral_confianza: float = 0.6
     ia_max_caracteres_contexto: int = 120_000  # tope de texto de evidencias enviado al modelo
     ollama_url: str = "http://localhost:11434"
-    ollama_modelo: str = "qwen2.5:7b"
+    ollama_modelo: str = "qwen2.5-coder:7b"
+    ollama_num_ctx: int = 16384  # Ollama recorta el prompt en silencio si no cabe
+    # Sandbox de ejecución de pruebas (RNF-04): vacío = deshabilitada
+    sandbox_url: str = ""
+    sandbox_token: str = ""
+    sandbox_timeout_s: int = 60
     admin_correo: str | None = None
     admin_contrasena: str | None = None
+
+
+SECRETOS_INSEGUROS = {
+    "dev-inseguro-cambiar-en-produccion",
+    "cambia-esta-clave-larga-y-aleatoria",
+    "cambia-esto-por-un-token-largo",
+}
+
+
+def verificar_secretos(s: Settings) -> None:
+    """Impide arrancar con secretos de ejemplo fuera del entorno de desarrollo (SQLite).
+
+    Con PostgreSQL (Docker / producción) se exige SECRET_KEY propio de al menos 32 caracteres
+    y, si la sandbox está activa, un SANDBOX_TOKEN propio de al menos 32 caracteres.
+    """
+    if s.database_url.startswith("sqlite"):
+        return
+    errores = []
+    if s.secret_key in SECRETOS_INSEGUROS or len(s.secret_key) < 32:
+        errores.append("SECRET_KEY es de ejemplo o tiene menos de 32 caracteres")
+    if s.sandbox_url and (s.sandbox_token in SECRETOS_INSEGUROS or len(s.sandbox_token) < 32):
+        errores.append("SANDBOX_TOKEN es de ejemplo o tiene menos de 32 caracteres")
+    if errores:
+        raise RuntimeError(
+            "Configuración insegura: " + "; ".join(errores) + ". "
+            "Genera valores aleatorios en .env, "
+            "p. ej. python -c \"import secrets; print(secrets.token_urlsafe(48))\"."
+        )
 
 
 @lru_cache

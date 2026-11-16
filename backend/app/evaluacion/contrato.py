@@ -10,7 +10,7 @@ Flujo:
 
 Reglas:
 - `evaluar` no toca la base de datos ni la red salvo para llamar al proveedor de IA.
-- `evaluar` no ejecuta código del estudiante (las pruebas en sandbox llegan en otra iteración).
+- `evaluar` no ejecuta código del estudiante por sí mismo: las pruebas corren solo en el servicio sandbox (contenedor aislado).
 - `niveles_elegidos` contiene TODOS los criterios de la rúbrica y solo nombres de nivel existentes.
 - Si el modelo falla tras los reintentos, `evaluar` lanza `ErrorEvaluacion` con un mensaje en español.
 """
@@ -107,6 +107,9 @@ class ResultadoPruebas(BaseModel):
     exitosas: int = 0
     fallidas: int = 0
     salida: str = ""
+    errores: int = 0
+    omitidas: int = 0
+    tiempo_agotado: bool = False
 
 
 class VerificacionTecnica(BaseModel):

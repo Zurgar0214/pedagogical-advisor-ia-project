@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.router import api_router
-from app.core.config import get_settings
+from app.core.config import get_settings, verificar_secretos
 from app.db.session import SessionLocal
 from app.services.usuarios import crear_admin_inicial
 
@@ -45,6 +45,7 @@ def _mensaje_validacion(error: dict) -> str:
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    verificar_secretos(settings)
     app = FastAPI(title=settings.app_nombre, version=settings.app_version, lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,

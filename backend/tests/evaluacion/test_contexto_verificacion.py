@@ -89,7 +89,7 @@ def test_notebook_extrae_celdas_y_detecta_sintaxis(tmp_path):
     assert a.lenguaje == "notebook"
     assert "celda 2 - código" in a.texto and "# Título" in a.texto
     assert [n for n, _ in a.celdas_python] == [2, 3]
-    v = verificacion.verificar(p)
+    v = verificacion.verificar(p, settings())
     assert len(v.errores_sintaxis) == 1
     assert "celda 3" in v.errores_sintaxis[0].archivo  # la magic de la celda 2 no es error
 
@@ -98,13 +98,13 @@ def test_sintaxis_invalida_detectada_y_conteo_por_lenguaje(tmp_path):
     p = preparar(
         contexto(tmp_path, {"bien.py": "x = 1\n", "mal.py": "def f(:\n  pass\n", "a.js": "var a;"})
     )
-    v = verificacion.verificar(p)
+    v = verificacion.verificar(p, settings())
     assert [(h.archivo, h.regla) for h in v.errores_sintaxis] == [("mal.py", "sintaxis")]
     assert v.errores_sintaxis[0].linea == 1
     assert v.archivos_por_lenguaje == {"python": 2, "javascript": 1}
     assert v.archivos_analizados == 3
     assert v.pruebas.ejecutadas is False
-    assert "siguiente iteración" in v.pruebas.motivo
+    assert "no incluye pruebas unitarias" in v.pruebas.motivo
 
 
 def test_ruff_se_ejecuta_y_limpia_temporales(tmp_path, monkeypatch):
@@ -118,7 +118,7 @@ def test_ruff_se_ejecuta_y_limpia_temporales(tmp_path, monkeypatch):
 
     monkeypatch.setattr(verificacion.tempfile, "mkdtemp", registrar)
     p = preparar(contexto(tmp_path, {"src/uno.py": "import os\n\nx = 1\n"}))
-    v = verificacion.verificar(p)
+    v = verificacion.verificar(p, settings())
     if verificacion._comando_ruff() is None:
         assert any("Ruff no está disponible" in n for n in v.notas)
     else:
@@ -129,7 +129,7 @@ def test_ruff_se_ejecuta_y_limpia_temporales(tmp_path, monkeypatch):
 
 def test_ruff_no_disponible_se_marca(tmp_path, monkeypatch):
     monkeypatch.setattr(verificacion, "_comando_ruff", lambda: None)
-    v = verificacion.verificar(preparar(contexto(tmp_path, {"a.py": "x = 1\n"})))
+    v = verificacion.verificar(preparar(contexto(tmp_path, {"a.py": "x = 1\n"})), settings())
     assert v.hallazgos_estaticos == []
     assert any("Ruff no está disponible" in n for n in v.notas)
 
@@ -165,7 +165,7 @@ def test_repo_github_se_lista_y_no_se_clona():
     p = preparar(c)
     assert p.repositorios_no_analizados == ["https://github.com/u/r"]
     assert any("no se clonan" in a for a in p.advertencias)
-    assert verificacion.verificar(p).repositorios_no_analizados == ["https://github.com/u/r"]
+    assert verificacion.verificar(p, settings()).repositorios_no_analizados == ["https://github.com/u/r"]
 
 
 def test_imagenes_segun_proveedor_y_limites(tmp_path, monkeypatch):
@@ -193,3 +193,10 @@ def test_imagenes_segun_proveedor_y_limites(tmp_path, monkeypatch):
     p3 = preparar(c, aceptar_imagenes=False)
     assert p3.imagenes == []
     assert sum("no admite imágenes" in a for a in p3.advertencias) == 7
+
+
+def test_pruebas_con_sandbox_deshabilitada_dan_motivo_claro(tmp_path):
+    p = preparar(contexto(tmp_path, {"a.py": "x = 1\n", "test_a.py": "def test_a():\n    pass\n"}))
+    v = verificacion.verificar(p, settings(sandbox_url=""))
+    assert v.pruebas.ejecutadas is False
+    assert "no está configurada" in v.pruebas.motivo

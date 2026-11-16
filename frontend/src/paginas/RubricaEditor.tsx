@@ -13,6 +13,7 @@ import {
 } from '../api/iteracion2'
 import { botonPrim, botonSec, campo, formatoFecha, mensajeError, tarjeta } from '../componentes/estilos'
 import { Aviso, Insignia } from '../componentes/ui'
+import ImportarRubrica from '../componentes/ImportarRubrica'
 
 const PLANTILLA: RubricaContenido = {
   competencias: [{ id: 'c1', nombre: 'Competencia 1', descripcion: '' }],
@@ -70,6 +71,8 @@ export default function RubricaEditor() {
   const [validando, setValidando] = useState(false)
   const [errorValidar, setErrorValidar] = useState<string | null>(null)
   const [pedirValidar, setPedirValidar] = useState(0)
+  const [importando, setImportando] = useState(false)
+  const [sucio, setSucio] = useState(false)
 
   const cargar = useCallback(async () => {
     try {
@@ -138,7 +141,20 @@ export default function RubricaEditor() {
       fn(n)
       return n
     })
+    setSucio(true)
     setAviso(null)
+  }
+
+  function cargarImportada(r: RubricaContenido) {
+    setContenido(copia(r))
+    setSucio(true) // propuesta de la IA sin guardar
+    setImportando(false)
+    setVista(null)
+    setAviso({
+      tipo: 'advertencia',
+      texto: 'Se cargó la propuesta de la IA en el editor. Revísala: la IA puede equivocarse. Nada se guarda hasta que pulses «Guardar como nueva versión».',
+    })
+    document.getElementById('editor-rubrica')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   function cambiarCriterio(i: number, fn: (c: CriterioRubrica) => void) {
@@ -160,6 +176,7 @@ export default function RubricaEditor() {
             },
       )
       setBaseNumero(v.numero)
+      setSucio(false)
       await cargar()
     } catch (e) {
       setErrorGuardar(mensajeError(e))
@@ -181,6 +198,7 @@ export default function RubricaEditor() {
     if (!v.contenido) return
     setContenido(copia(v.contenido))
     setBaseNumero(v.numero)
+    setSucio(false)
     setVista(null)
     setAviso({ tipo: 'ok', texto: `Se cargó la versión ${v.numero} en el editor. Guarda para crear una nueva versión.` })
     document.getElementById('editor-rubrica')?.scrollIntoView({ behavior: 'smooth' })
@@ -204,6 +222,13 @@ export default function RubricaEditor() {
       <p className="mt-1 text-sm text-slate-600">
         {baseNumero ? `Editando a partir de la versión ${baseNumero}.` : 'Aún no hay versiones; se parte de una plantilla inicial.'} Guardar siempre crea una versión nueva.
       </p>
+
+      <div className="mt-3">
+        <button type="button" className={botonSec} onClick={() => setImportando(true)}>Importar con IA (PDF o texto)</button>
+      </div>
+      {importando && (
+        <ImportarRubrica requiereConfirmacion={sucio || baseNumero !== null} onCerrar={() => setImportando(false)} onCargar={cargarImportada} />
+      )}
 
       <div aria-live="polite" className="mt-4 space-y-2">
         {aviso && <Aviso tipo={aviso.tipo}>{aviso.texto}</Aviso>}

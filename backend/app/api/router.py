@@ -7,6 +7,7 @@ from app.api import (
     evaluaciones,
     informes,
     laboratorios,
+    rubricas_ia,
     salud,
     usuarios,
 )
@@ -20,3 +21,4 @@ api_router.include_router(estudiantes.router)
 api_router.include_router(entregas.router)
 api_router.include_router(evaluaciones.router)
 api_router.include_router(informes.router)
+api_router.include_router(rubricas_ia.router)

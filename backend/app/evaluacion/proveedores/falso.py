@@ -9,6 +9,7 @@ import re
 
 from app.core.config import Settings
 from app.evaluacion.contrato import UsoModelo
+from app.evaluacion.esquema_rubrica import RubricaPropuesta
 from app.evaluacion.proveedores.base import BloqueTexto, ProveedorIA
 from app.informes.contrato import AgregadoInforme, SintesisInforme
 
@@ -72,6 +73,56 @@ def categoria_por_palabras(tema: str) -> str:
         if any(p in t for p in palabras):
             return categoria
     return "Otros"
+
+
+_NIVELES_ESTANDAR = (
+    ("Insuficiente", "No cumple lo esperado en este criterio.", 1.0),
+    ("Básico", "Cumple parcialmente lo esperado.", 3.0),
+    ("Competente", "Cumple lo esperado de forma adecuada.", 4.0),
+    ("Sobresaliente", "Supera lo esperado con calidad y rigor.", 5.0),
+)
+_LINEA_PESO = re.compile(r"^(?P<n>.*?\S)[\s(:\-–—]*(?P<p>\d{1,3}(?:[.,]\d+)?)\s*%\s*\)?[.;]?$")
+_VINETA = re.compile(r"^[\s\-*•\d.)]+")
+
+
+def _rubrica_falsa(texto: str) -> RubricaPropuesta:
+    """Heurística: líneas 'Nombre (30%)' o 'Nombre ... 30 %' son criterios con peso."""
+    m = re.search(r"<documento_rubrica>\n(.*?)\n</documento_rubrica>", texto, re.DOTALL)
+    doc = m.group(1) if m else texto
+    hallados: list[tuple[str, float]] = []
+    for ln in doc.splitlines():
+        mp = _LINEA_PESO.match(ln.strip())
+        if not mp:
+            continue
+        nombre = _VINETA.sub("", mp["n"]).strip(" .:-–—(")
+        if nombre:
+            hallados.append((nombre[:120], float(mp["p"].replace(",", "."))))
+    observaciones: list[str] = []
+    if not hallados:
+        hallados = [("Criterio 1", 50.0), ("Criterio 2", 50.0)]
+        observaciones.append(
+            "[Demostración] No se detectaron criterios con peso en el texto; se generaron 2 criterios "
+            "genéricos al 50 %."
+        )
+    return RubricaPropuesta.model_validate(
+        {
+            "competencias": [{"id": "c1", "nombre": "General", "descripcion": ""}],
+            "criterios": [
+                {
+                    "id": f"k{i}",
+                    "nombre": nombre,
+                    "descripcion": "",
+                    "competencia_id": "c1",
+                    "peso": peso,
+                    "niveles": [
+                        {"nombre": n, "descriptor": d, "valor": v} for n, d, v in _NIVELES_ESTANDAR
+                    ],
+                }
+                for i, (nombre, peso) in enumerate(hallados, start=1)
+            ],
+            "observaciones": observaciones,
+        }
+    )
 
 
 class FalsoProveedor(ProveedorIA):
@@ -155,6 +206,15 @@ class FalsoProveedor(ProveedorIA):
         )
         if esquema is SintesisInforme:
             return self._sintesis(texto, modelo, proposito)
+        if esquema is RubricaPropuesta:
+            propuesta = _rubrica_falsa(texto)
+            return propuesta, UsoModelo(
+                proveedor=self.nombre,
+                modelo=modelo,
+                proposito=proposito,
+                tokens_entrada=len(texto) // 4,
+                tokens_salida=len(propuesta.model_dump_json()) // 4,
+            )
         rubrica = _json_tag("rubrica", texto, {"criterios": []})["criterios"]
         temas = _json_tag("temas", texto, [])
         verificacion = _json_tag("verificacion_tecnica", texto, {})

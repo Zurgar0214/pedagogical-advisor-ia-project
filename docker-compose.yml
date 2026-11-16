@@ -21,11 +21,36 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-asesor}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-asesor}
+      SANDBOX_URL: http://sandbox:8100
     volumes:
       - storage:/app/storage
     depends_on:
       db:
         condition: service_healthy
+      sandbox:
+        condition: service_started
+
+  # Solo construye la imagen de ejecución de pruebas del estudiante y termina.
+  sandbox-imagen:
+    build: ./sandbox/imagen
+    image: asesor-sandbox-python:1
+    entrypoint: ["true"]
+    restart: "no"
+
+  # ATENCION: el socket de Docker da poder sobre el host. Por eso este servicio NO publica puertos
+  # (solo la red interna de compose), exige un token (SANDBOX_TOKEN) y solo sabe lanzar un comando
+  # fijo (`docker run` con aislamiento: sin red, solo lectura, límites, usuario sin privilegios).
+  sandbox:
+    build: ./sandbox/servicio
+    restart: unless-stopped
+    environment:
+      SANDBOX_TOKEN: ${SANDBOX_TOKEN:-}
+      SANDBOX_IMAGEN: asesor-sandbox-python:1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      sandbox-imagen:
+        condition: service_completed_successfully
 
   web:
     build: ./frontend

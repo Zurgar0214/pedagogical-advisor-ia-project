@@ -223,3 +223,37 @@ Ids estables (slug sin tildes). Categorías sin temas no aparecen. Nivel de cate
 | `GET /api/informes/{id}` | ídem | Informe completo (vista recortada para estudiante) |
 | `GET /api/informes/{id}/mapa` | ídem | Mapa (solo si `listo`, si no 409) |
 | `GET /api/informes/{id}/pdf` | ídem | PDF descargable (`attachment`) del informe `listo` |
+
+# Iteración 5: interpretación de rúbricas con IA (RF-04)
+
+La IA **propone** una rúbrica estructurada a partir de un PDF o de texto pegado; **no se guarda nada**. El docente
+la revisa en el editor visual, la corrige y la guarda con el endpoint existente
+`POST /api/laboratorios/{id}/rubrica/versiones` (que valida pesos = 100 % y bloquea si hay inconsistencias).
+
+## Endpoint
+
+| Método y ruta | Rol | Notas |
+|---------------|-----|-------|
+| `POST /api/rubricas/interpretar` | docente, admin | `multipart/form-data` con **uno** de: `archivo` (PDF ≤ 10 MB, firma `%PDF`, ≥ 200 caracteres de texto legible, sin contraseña) o `texto` (texto plano). Ambos o ninguno → 400. Síncrono. 503 si el proveedor de IA no está disponible; 502 si la IA no produce una rúbrica válida tras reintentar. Registra auditoría `interpretar_rubrica` (sin guardar el texto) |
+
+Límites de `texto`: mínimo 50 y máximo 60.000 caracteres; un PDF cuyo texto supere 60.000 caracteres se recorta con advertencia.
+
+## Respuesta
+
+```json
+{
+  "rubrica": { "competencias": [{"id": "c1", "nombre": "...", "descripcion": ""}],
+               "criterios": [{"id": "k1", "nombre": "...", "descripcion": "", "competencia_id": "c1", "peso": 40,
+                              "niveles": [{"nombre": "Básico", "descriptor": "...", "valor": 3.0}]}] },
+  "validacion": { "valida": false, "inconsistencias": ["Los pesos suman 90 %, deben sumar 100 %."] },
+  "observaciones": ["El documento no indica pesos; se repartieron por igual."],
+  "advertencias": ["El texto contiene instrucciones dirigidas a la IA; se ignoraron."],
+  "proveedor": "claude", "modelo": "claude-haiku-5-5",
+  "uso": [UsoModelo], "costo_usd_estimado": 0.0012
+}
+```
+
+- `rubrica` tiene la misma forma que el cuerpo de `POST .../rubrica/versiones` (`RubricaContenido`).
+- `validacion` = resultado del validador existente (`/api/rubricas/validar`) sobre la rúbrica propuesta.
+- `observaciones`: ambigüedades que la IA reporta (pesos ausentes, escalas no 0–5 convertidas, criterios sin competencia clara).
+- La IA extrae fielmente: no inventa criterios; si el documento no trae pesos, reparte por igual y lo dice; si la escala no es 0,0–5,0, la convierte linealmente y lo dice. **No corrige** pesos que no suman 100: los deja y el validador los marca (regla de oro 6).

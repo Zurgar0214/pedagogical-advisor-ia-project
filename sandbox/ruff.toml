@@ -1,0 +1,2 @@
+extend = "../backend/ruff.toml"
+line-length = 120

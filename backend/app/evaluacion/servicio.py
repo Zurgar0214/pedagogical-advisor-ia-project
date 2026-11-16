@@ -121,9 +121,22 @@ def _criterios_a_escalar(
             partes.append(
                 f"nivel alto ('{c.nivel}') pese a {len(ver.errores_sintaxis)} errores de sintaxis"
             )
+        if _pruebas_con_fallos(ver) and _nivel_alto(crit, c.nivel):
+            partes.append(f"nivel alto ('{c.nivel}') pese a que {_pruebas_con_fallos(ver)}")
         if partes:
             motivos[crit.id] = "; ".join(partes)
     return motivos
+
+
+def _pruebas_con_fallos(ver: VerificacionTecnica) -> str:
+    """Describe los fallos de las pruebas ejecutadas en la sandbox ('' si no hay o no se ejecutaron)."""
+    p = ver.pruebas
+    if not p.ejecutadas:
+        return ""
+    if p.tiempo_agotado:
+        return "las pruebas superaron el tiempo límite"
+    malas = p.fallidas + p.errores
+    return f"{malas} de {p.total} pruebas unitarias fallan" if malas else ""
 
 
 # ---------- Pipeline ----------
@@ -163,7 +176,7 @@ def ejecutar_pipeline(
         raise ErrorEvaluacion(
             "La entrega no tiene evidencias analizables (informe con texto, código o imágenes)."
         )
-    verificacion = verificar(preparado)
+    verificacion = verificar(preparado, settings)
 
     estables = prompts.bloques_estables(contexto)
     usos: list[UsoModelo] = []
@@ -261,6 +274,20 @@ def ejecutar_pipeline(
             "Criterios con confianza baja tras el escalamiento: " + ", ".join(baja_confianza)
         )
 
+    # Las pruebas de la sandbox son evidencia objetiva: un nivel alto con pruebas fallando lo revisa el docente.
+    altos_con_fallos = [
+        crit.id
+        for crit in rubrica.criterios
+        if _pruebas_con_fallos(verificacion)
+        and _nivel_alto(crit, next(c.nivel for c in criterios if c.criterio_id == crit.id))
+    ]
+    if altos_con_fallos:
+        advertencias.append(
+            f"Nivel alto pese a que {_pruebas_con_fallos(verificacion)} en: "
+            + ", ".join(altos_con_fallos)
+            + ". Revisa estos criterios."
+        )
+
     return ResultadoEvaluacion(
         resultado=resultado,
         verificacion=verificacion,
@@ -269,7 +296,9 @@ def ejecutar_pipeline(
         proveedor=proveedor.nombre,
         modelo_principal=modelo_principal,
         criterios_escalados=escalados,
-        requiere_revision=bool(escalamiento_fallido or hay_inyeccion or sin_evidencia),
+        requiere_revision=bool(
+            escalamiento_fallido or hay_inyeccion or sin_evidencia or altos_con_fallos
+        ),
         advertencias=advertencias,
         version_prompt=VERSION_PROMPT,
     )

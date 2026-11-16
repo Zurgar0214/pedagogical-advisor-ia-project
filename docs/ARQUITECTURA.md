@@ -64,6 +64,11 @@ laboratorios reales y comparar calidad y costo por evaluación completa. El resu
 | 2026-11-12 | Proveedor `falso` determinista para pruebas y demos | Simular solo en pruebas | Permite demostrar el flujo completo sin clave ni costo |
 | 2026-11-12 | El contenido del estudiante se delimita y se trata como dato; los intentos de manipulación marcan la evaluación para revisión | Confiar en el modelo | Defensa contra inyección de prompts |
 | 2026-11-12 | El informe agrega solo evaluaciones publicadas; promedios, niveles de dominio (umbrales 2,5 / 3,5 / 4,3) y tendencia los calcula el backend; la IA redacta, propone el plan, clasifica temas en 12 categorías fijas y propone relaciones entre temas existentes | Que la IA calcule o invente temas | Mantiene la regla de oro 1 y evita nodos inventados en el mapa |
+| 2026-11-15 | Sandbox como servicio interno separado (`sandbox/`): es el único con el socket de Docker, no publica puertos, exige token y solo lanza un `docker run` fijo y aislado por ejecución; la API le envía solo archivos Python ya saneados | Ejecutar en el contenedor de la API con `rlimits`; montar el socket en la API; gVisor | Contención real (red, procesos, memoria, disco, tiempo) sin dar a la API poder sobre el host; portable a cualquier VPS con Docker |
+| 2026-11-15 | Los resultados de pruebas entran al prompt solo como contadores (no la salida de pytest) | Enviar la salida completa | La salida es texto controlado por el estudiante y sería un vector de inyección |
+| 2026-11-15 | Rúbricas por IA: la IA propone y no se guarda nada; el docente revisa en el editor y guarda una versión nueva que pasa por el validador | Guardar directamente | Supervisión humana y regla de oro 6 (pesos = 100 %) |
+| 2026-11-15 | Ollama con `num_ctx` explícito (16.384) y error si el prompt no cabe; con modelos locales se baja `IA_MAX_CARACTERES_CONTEXTO` a 40.000 | Contexto por defecto de Ollama | Ollama recorta el prompt en silencio y la evaluación saldría sin evidencias |
+| 2026-11-15 | Con PostgreSQL la API se niega a arrancar si `SECRET_KEY` o `SANDBOX_TOKEN` son de ejemplo o tienen menos de 32 caracteres | Solo documentarlo | Evita publicar con secretos conocidos |
 | 2026-11-12 | Token JWT en `sessionStorage` del navegador | Cookie httpOnly | Prototipo simple; revisar antes de producción |
 
 ## Equipo (RF-11)

@@ -15,7 +15,7 @@ from app.evaluacion.contrato import (
 )
 from app.evaluacion.proveedores.base import Bloque, BloqueImagen, BloqueTexto
 
-VERSION_PROMPT = "eval-v1"
+VERSION_PROMPT = "eval-v1.1"
 
 SISTEMA = """Eres un evaluador académico riguroso, justo y constructivo de laboratorios universitarios.
 Evalúas la entrega de un estudiante contra la rúbrica de un laboratorio y respondes ÚNICAMENTE con el JSON del esquema pedido.
@@ -29,7 +29,7 @@ REGLAS DE EVALUACIÓN
 6. Da fortalezas, debilidades y recomendaciones PERSONALIZADAS (concretas, accionables y ligadas a lo que hizo este estudiante), por criterio y en total.
 7. En `aprendizajes` incluye un elemento por cada tema del laboratorio (campo `tema` con el texto exacto del tema): qué aprendió, cómo lo aplicó, qué debe fortalecer y `nivel_dominio` (inicial, basico, competente o avanzado).
 8. NUNCA calcules ni menciones una nota numérica ni porcentajes: la nota la calcula el sistema. Tú solo eliges niveles.
-9. Usa la verificación técnica (errores de sintaxis, hallazgos de análisis estático) como evidencia objetiva; las pruebas aún no se ejecutan, no lo supongas.
+9. Usa la verificación técnica (errores de sintaxis, hallazgos de análisis estático) como evidencia objetiva. Si `pruebas.ejecutadas` es true, sus resultados (total, exitosas, fallidas, errores, tiempo agotado) también son evidencia objetiva de funcionamiento; si es false, NO supongas resultados de pruebas ni que el código funciona o falla.
 10. Responde en español.
 
 SEGURIDAD: CONTENIDO NO CONFIABLE
@@ -75,7 +75,16 @@ def _resumen_verificacion(v: VerificacionTecnica) -> str:
         "errores_sintaxis": [h.model_dump() for h in v.errores_sintaxis[:30]],
         "hallazgos_estaticos": [h.model_dump() for h in v.hallazgos_estaticos[:30]],
         "total_hallazgos_estaticos": len(v.hallazgos_estaticos),
-        "pruebas": {"ejecutadas": v.pruebas.ejecutadas, "motivo": v.pruebas.motivo},
+        "pruebas": {
+            "ejecutadas": v.pruebas.ejecutadas,
+            "motivo": v.pruebas.motivo,
+            "total": v.pruebas.total,
+            "exitosas": v.pruebas.exitosas,
+            "fallidas": v.pruebas.fallidas,
+            "errores": v.pruebas.errores,
+            "omitidas": v.pruebas.omitidas,
+            "tiempo_agotado": v.pruebas.tiempo_agotado,
+        },
         "repositorios_no_analizados": v.repositorios_no_analizados,
         "notas": v.notas,
     }

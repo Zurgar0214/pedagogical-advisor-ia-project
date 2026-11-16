@@ -67,6 +67,9 @@ export interface ResultadoPruebas {
   total: number
   exitosas: number
   fallidas: number
+  errores?: number
+  omitidas?: number
+  tiempo_agotado?: boolean
   salida: string
 }
 

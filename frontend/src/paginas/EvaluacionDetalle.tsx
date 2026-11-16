@@ -204,7 +204,15 @@ function PanelVerificacion({ v }: { v: VerificacionTecnica }) {
       <div className="text-sm text-slate-700">
         <h3 className="font-semibold text-slate-800">Pruebas</h3>
         {v.pruebas.ejecutadas ? (
-          <p>Total: {v.pruebas.total} · Exitosas: {v.pruebas.exitosas} · Fallidas: {v.pruebas.fallidas}</p>
+          <>
+            <p>
+              Total: {v.pruebas.total} · Exitosas: {v.pruebas.exitosas} · Fallidas: {v.pruebas.fallidas}
+              {!!v.pruebas.errores && ` · Con error: ${v.pruebas.errores}`}
+              {!!v.pruebas.omitidas && ` · Omitidas: ${v.pruebas.omitidas}`}
+            </p>
+            {v.pruebas.tiempo_agotado && <p className="font-medium text-amber-800">Las pruebas superaron el tiempo límite y se detuvieron.</p>}
+            <p className="text-xs text-slate-500">Ejecutadas en una sandbox aislada: sin red, con límites de CPU, memoria y tiempo, y usuario sin privilegios.</p>
+          </>
         ) : (
           <p>No se ejecutaron pruebas{v.pruebas.motivo ? `: ${v.pruebas.motivo}` : '.'}</p>
         )}

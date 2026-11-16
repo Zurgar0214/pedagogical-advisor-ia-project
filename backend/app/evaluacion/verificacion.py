@@ -3,7 +3,8 @@
 - Sintaxis de Python con `ast.parse` (incluidas las celdas de código de los notebooks).
 - Análisis estático con `ruff check` en un subproceso con timeout, sobre un directorio temporal
   que se elimina siempre. Ruff analiza el código, no lo ejecuta.
-- Las pruebas en sandbox llegan en la siguiente iteración.
+- Pruebas unitarias del estudiante: se ejecutan SOLO en la sandbox (contenedor aislado, sin red,
+  con límites), a través de `app.evaluacion.sandbox`; este módulo nunca ejecuta código del estudiante.
 """
 
 import ast
@@ -15,12 +16,13 @@ import tempfile
 from collections import Counter
 from pathlib import Path
 
+from app.core.config import Settings
 from app.evaluacion.contexto import ContextoPreparado
-from app.evaluacion.contrato import HallazgoCodigo, ResultadoPruebas, VerificacionTecnica
+from app.evaluacion.contrato import HallazgoCodigo, VerificacionTecnica
+from app.evaluacion.sandbox import ejecutar_pruebas
 
 TIMEOUT_RUFF_S = 30
 MAX_HALLAZGOS = 200
-MOTIVO_PRUEBAS = "La ejecución de pruebas en sandbox se implementará en la siguiente iteración"
 
 
 def _sintaxis(preparado: ContextoPreparado) -> list[HallazgoCodigo]:
@@ -133,7 +135,7 @@ def _ruff(preparado: ContextoPreparado, notas: list[str]) -> list[HallazgoCodigo
         shutil.rmtree(tmp, ignore_errors=True)
 
 
-def verificar(preparado: ContextoPreparado) -> VerificacionTecnica:
+def verificar(preparado: ContextoPreparado, settings: Settings) -> VerificacionTecnica:
     notas: list[str] = []
     por_lenguaje = Counter(a.lenguaje for a in preparado.archivos)
     return VerificacionTecnica(
@@ -141,7 +143,7 @@ def verificar(preparado: ContextoPreparado) -> VerificacionTecnica:
         archivos_por_lenguaje=dict(por_lenguaje),
         errores_sintaxis=_sintaxis(preparado),
         hallazgos_estaticos=_ruff(preparado, notas),
-        pruebas=ResultadoPruebas(ejecutadas=False, motivo=MOTIVO_PRUEBAS),
+        pruebas=ejecutar_pruebas(preparado.archivos, settings),
         repositorios_no_analizados=list(preparado.repositorios_no_analizados),
         notas=notas,
     )

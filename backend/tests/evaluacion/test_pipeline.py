@@ -30,7 +30,7 @@ def test_flujo_feliz_sin_escalamiento():
     assert len(prov.llamadas) == 1
     assert r.niveles_elegidos == {"k1": "N2.5", "k2": "N2.5"}
     assert r.criterios_escalados == [] and not r.requiere_revision
-    assert r.version_prompt == "eval-v1"
+    assert r.version_prompt == "eval-v1.1"
     assert r.proveedor == "simulado" and r.modelo_principal == "modelo-barato"
     assert [c.modelo for c in r.resultado.criterios] == ["modelo-barato"] * 2
     assert r.resultado.criterios[0].evidencias[0].evidencia_id == 1  # completado desde la fuente
@@ -211,7 +211,7 @@ def test_prompt_no_filtra_pesos_ni_valores_y_estable_antes_que_variable():
 def test_evaluar_con_falso_proveedor_de_punta_a_punta(tmp_path):
     ctx = contexto(tmp_path, codigo={"main.py": "print('hola')\n"})
     r = servicio.evaluar(ctx, settings(ai_provider="falso"))
-    assert r.proveedor == "falso" and r.version_prompt == "eval-v1"
+    assert r.proveedor == "falso" and r.version_prompt == "eval-v1.1"
     assert set(r.niveles_elegidos) == {"k1", "k2"}
     for cid, nivel in r.niveles_elegidos.items():
         crit_rub = next(c for c in ctx.rubrica.criterios if c.id == cid)
@@ -260,3 +260,40 @@ def test_calculo_de_costo():
     # Haiku por encima de 100K tokens de prompt: 0,50 / 2,50
     assert costo_estimado("claude-haiku-5-5", 150_000, 1000) == pytest.approx(0.0775)
     assert costo_estimado("llama3", 1000, 1000) == 0.0
+
+
+def test_nivel_alto_con_pruebas_fallidas_escala_y_marca_revision(tmp_path, monkeypatch):
+    from app.evaluacion import verificacion
+    from app.evaluacion.contrato import ResultadoPruebas
+
+    monkeypatch.setattr(
+        verificacion,
+        "ejecutar_pruebas",
+        lambda archivos, s: ResultadoPruebas(ejecutadas=True, total=4, exitosas=2, fallidas=2),
+    )
+    ctx = contexto(tmp_path, codigo={"ok.py": "def f():\n    return 1\n"})
+    prov = ProveedorSimulado(
+        [
+            salida([crit("k1", nivel="N5"), crit("k2", nivel="N0")]),
+            salida_esc([crit("k1", nivel="N5")]),  # el escalamiento mantiene el nivel alto
+        ]
+    )
+    r = correr(prov, ctx)
+    assert r.criterios_escalados == ["k1"]
+    assert "2 de 4 pruebas unitarias fallan" in prov.texto_variables(1)
+    assert r.requiere_revision
+    assert any("pruebas unitarias fallan en: k1" in a for a in r.advertencias)
+
+
+def test_pruebas_exitosas_no_escalan(tmp_path, monkeypatch):
+    from app.evaluacion import verificacion
+    from app.evaluacion.contrato import ResultadoPruebas
+
+    monkeypatch.setattr(
+        verificacion,
+        "ejecutar_pruebas",
+        lambda archivos, s: ResultadoPruebas(ejecutadas=True, total=3, exitosas=3),
+    )
+    ctx = contexto(tmp_path, codigo={"ok.py": "def f():\n    return 1\n"})
+    r = correr(ProveedorSimulado([salida([crit("k1", nivel="N5"), crit("k2", nivel="N0")])]), ctx)
+    assert r.criterios_escalados == [] and not r.requiere_revision
