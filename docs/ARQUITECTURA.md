@@ -77,12 +77,11 @@ laboratorios reales y comparar calidad y costo por evaluación completa. El resu
 
 | Nombre | Rol | Foto |
 |--------|-----|------|
-| Juan Diego Varón Valencia | Ingeniero de software full-stack e IA (único integrante): requisitos, arquitectura, dirección de agentes de IA, verificación y despliegue | pendiente |
+| Juan Diego Varón Valencia | Ingeniero de software full-stack e IA (único integrante): requisitos, arquitectura, dirección de agentes de IA, verificación y despliegue | `frontend/public/equipo/juan-diego.jpg` |
 
 ## Pendientes de decidir
 
 - Proveedor de IA por defecto y presupuesto de API.
-- Foto del integrante para RF-11.
 - Laboratorios reales de cohortes 1 y 2 para pruebas (con sus rúbricas).
 
 ## Modelo de datos (v1)

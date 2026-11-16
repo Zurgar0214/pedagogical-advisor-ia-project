@@ -17,7 +17,7 @@ Una fila solo pasa a ✅ cuando su criterio de aceptación se comprobó (prueba 
 | RF-08 | Revisión y aprobación docente | Docente puede ajustar nivel/nota por criterio con justificación; queda auditado quién y cuándo | ✅ ajuste por criterio con justificación e historial, aprobación y publicación; verificado de punta a punta |
 | RF-09 | Informe integrado del aprendizaje (ambas cohortes) | Incluye notas, competencias, niveles de dominio, evolución, brechas y plan de fortalecimiento; visible y descargable (PDF) | ✅ agregado determinista solo con evaluaciones publicadas (notas, competencias, niveles, tendencia entre cohortes, brechas); la IA redacta resumen, evolución y plan validados con Pydantic; página web y PDF; verificado con datos de demostración |
 | RF-10 | Mapa mental interactivo de competencias en IA | Nodos = temáticas/conceptos; por nodo: laboratorios, evidencias, nivel de dominio, aspectos a profundizar; navegación, zoom, exploración y descarga (PNG/SVG/JSON) | ✅ mapa raíz → categorías → temas → laboratorios con nivel de dominio y relaciones entre temas; búsqueda, filtro por cohorte, plegado, zoom, teclado y descarga PNG/SVG/JSON; verificado en navegador |
-| RF-11 | Presentación del proyecto y equipo | Página con abstract (objetivos, funcionalidades, tecnologías, aportes) y foto, nombre y rol de cada integrante | 🟨 página lista; falta la foto |
+| RF-11 | Presentación del proyecto y equipo | Página con abstract (objetivos, funcionalidades, tecnologías, aportes) y foto, nombre y rol de cada integrante | ✅ página con abstract (objetivos, funcionalidades, tecnologías, aportes) y el integrante con foto, nombre y rol |
 
 ## Ingeniería y confiabilidad
 
