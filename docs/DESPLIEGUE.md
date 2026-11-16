@@ -205,6 +205,15 @@ Los respaldos quedan en `~/asesor/respaldos/`. Para llevarlos a tu PC:
 scp -i .\ssh-key-asesor.key -r ubuntu@<IP_PUBLICA>:asesor/respaldos .
 ```
 
+**Datos de demostración (sustentación):** en producción existen un docente (`docente.demo@asesor.local`) y un
+estudiante (`estudiante.demo@asesor.local`) con 6 laboratorios (3 por cohorte) evaluados y publicados, un ajuste docente
+en C2-LAB01, pruebas ejecutadas en la sandbox (C1-LAB01: 2 de 2 pasan; C2-LAB01: 1 de 3 falla) y un informe integral
+con su mapa mental. Las contraseñas se generaron al azar y están solo en el servidor:
+
+```bash
+cat ~/credenciales_demo.json
+```
+
 **Cambiar el proveedor de IA:** edita `~/asesor/.env` (`AI_PROVIDER`, `ANTHROPIC_API_KEY`) y vuelve a ejecutar `desplegar.sh`.
 
 ## Opcional: Ollama en el mismo servidor (sin costo, lento)
