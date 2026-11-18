@@ -100,12 +100,12 @@ function VistaInforme({ informe, esDocente }: { informe: TipoInforme; esDocente:
       <Seccion id="h-cab" titulo={`Informe de ${informe.estudiante.nombre}`}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Cifra etiqueta="Promedio general">
-            <span className="font-serif text-3xl font-semibold">{formatoNota(ag.promedio_general)}</span>
+            <span className="font-display text-3xl font-semibold">{formatoNota(ag.promedio_general)}</span>
             <span className="text-sm text-slate-600"> / 5,0</span>
           </Cifra>
           <Cifra etiqueta="Nivel general"><InsigniaDominio nivel={ag.nivel_general} /></Cifra>
           <Cifra etiqueta="Laboratorios evaluados">
-            <span className="font-serif text-3xl font-semibold">{ag.laboratorios.length}</span>
+            <span className="font-display text-3xl font-semibold">{ag.laboratorios.length}</span>
             <span className="text-sm text-slate-600"> de {ag.laboratorios_totales}</span>
           </Cifra>
           <Cifra etiqueta="Promedio por cohorte">
@@ -363,7 +363,7 @@ export default function Informe() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
-      <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Informe integral</h1>
+      <h1 className="font-display text-[1.95rem] font-semibold leading-tight text-tinta">Informe integral</h1>
       <p className="mt-1 text-sm text-slate-600">Resumen del aprendizaje a lo largo de las cohortes 1 y 2, descargable en PDF.</p>
 
       {!esEstudiante && (

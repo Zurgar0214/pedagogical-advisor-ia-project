@@ -11,7 +11,8 @@ RUN pip install --no-cache-dir \
     numpy==2.2.1 \
     pandas==2.2.3 \
     scikit-learn==1.6.0 \
-    matplotlib==3.10.0
+    matplotlib==3.10.0 \
+    requests==2.32.3
 
 COPY ejecutar.py /opt/ejecutar.py
 

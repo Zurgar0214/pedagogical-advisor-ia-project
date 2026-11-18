@@ -135,7 +135,7 @@ export default function ImportarRubrica({ requiereConfirmacion, onCerrar, onCarg
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 id="imp-titulo" className="font-serif text-xl font-semibold text-tinta">Importar rúbrica con IA</h2>
+            <h2 id="imp-titulo" className="font-display text-xl font-semibold text-tinta">Importar rúbrica con IA</h2>
             <p className="mt-1 text-sm text-slate-700">
               Sube el PDF de la rúbrica o pega su texto. La IA propone una estructura; tú la revisas antes de guardar.
             </p>

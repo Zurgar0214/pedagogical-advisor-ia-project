@@ -35,7 +35,7 @@ function Nota({ etiqueta, valor, destacada }: { etiqueta: string; valor: number 
   return (
     <div className={`rounded-lg border px-4 py-3 text-center ${destacada ? 'border-marca bg-blue-50' : 'border-slate-200 bg-slate-50'}`}>
       <p className="text-xs font-semibold text-slate-600">{etiqueta}</p>
-      <p className={`font-serif font-semibold text-tinta ${destacada ? 'text-4xl' : 'text-3xl'}`}>
+      <p className={`font-display font-semibold text-tinta ${destacada ? 'text-4xl' : 'text-3xl'}`}>
         {formatoNota(valor)} <span className="text-sm font-normal text-slate-600">/ 5,0</span>
       </p>
     </div>
@@ -381,7 +381,7 @@ export default function EvaluacionDetalle() {
         {esDocente ? '← Revisión docente' : '← Mi entrega'}
       </Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">
+        <h1 className="font-display text-[1.95rem] font-semibold leading-tight text-tinta">
           {esDocente ? 'Evaluación' : 'Retroalimentación'} · {ev.laboratorio.codigo} {ev.laboratorio.titulo}
         </h1>
         <Insignia tono={TONO_EVAL[ev.estado]}>{ETIQUETA_EVAL[ev.estado]}</Insignia>

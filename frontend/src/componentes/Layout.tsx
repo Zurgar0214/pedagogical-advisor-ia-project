@@ -48,7 +48,7 @@ function Marca() {
         <rect x="18" y="12.5" width="7" height="7" rx="1.5" fill="var(--color-resaltador)" />
       </svg>
       <span className="leading-tight">
-        <span className="block font-serif text-[1.05rem] font-semibold">Asesor Pedagógico</span>
+        <span className="block font-display text-[1.05rem] font-semibold">Asesor Pedagógico</span>
         <span className="block text-xs text-white/65">Universidad de Manizales</span>
       </span>
     </NavLink>

@@ -218,7 +218,7 @@ export default function RubricaEditor() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
       <Link to="/laboratorios" className="text-sm text-marca underline">← Laboratorios</Link>
-      <h1 className="mt-2 font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Rúbrica de {lab ? `${lab.codigo} · ${lab.titulo}` : 'laboratorio'}</h1>
+      <h1 className="mt-2 font-display text-[1.95rem] font-semibold leading-tight text-tinta">Rúbrica de {lab ? `${lab.codigo} · ${lab.titulo}` : 'laboratorio'}</h1>
       <p className="mt-1 text-sm text-slate-600">
         {baseNumero ? `Editando a partir de la versión ${baseNumero}.` : 'Aún no hay versiones; se parte de una plantilla inicial.'} Guardar siempre crea una versión nueva.
       </p>

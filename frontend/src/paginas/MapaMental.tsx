@@ -224,7 +224,7 @@ function PanelNodo({ mapa, nodo, ir }: { mapa: Mapa; nodo: NodoMapa | null; ir: 
   return (
     <div>
       <p className="text-xs font-semibold text-slate-600">{ETIQUETA_TIPO[nodo.tipo]}</p>
-      <h3 className="font-serif text-lg font-semibold text-tinta">{nodo.etiqueta}</h3>
+      <h3 className="font-display text-lg font-semibold text-tinta">{nodo.etiqueta}</h3>
       <div className="mt-2">{cuerpo}</div>
     </div>
   )
@@ -571,7 +571,7 @@ export default function MapaMental() {
   const { esEstudiante, estudiantes, seleccion, setSeleccion, estudianteId, error } = useEstudianteActivo()
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 lg:px-10 lg:py-10">
-      <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Mapa mental de competencias</h1>
+      <h1 className="font-display text-[1.95rem] font-semibold leading-tight text-tinta">Mapa mental de competencias</h1>
       <p className="mt-1 text-sm text-slate-600">Temas, categorías y laboratorios con el nivel de dominio de cada uno, construido desde el informe.</p>
       {!esEstudiante && (
         <div className="mt-4">

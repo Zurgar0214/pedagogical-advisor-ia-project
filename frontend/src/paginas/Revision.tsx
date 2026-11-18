@@ -31,7 +31,7 @@ export default function Revision() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
-      <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Revisión docente</h1>
+      <h1 className="font-display text-[1.95rem] font-semibold leading-tight text-tinta">Revisión docente</h1>
       <p className="mt-1 text-sm text-slate-600">Evaluaciones generadas con IA pendientes de revisión, aprobación o publicación.</p>
 
       <div className="mt-4 max-w-xs">

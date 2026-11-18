@@ -26,7 +26,7 @@ export default function RutaProtegida({ roles, children }: Props) {
   if (roles && !roles.includes(usuario.rol)) {
     return (
       <section className="mx-auto max-w-3xl px-4 py-10">
-        <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Acceso denegado</h1>
+        <h1 className="font-display text-[1.95rem] font-semibold leading-tight text-tinta">Acceso denegado</h1>
         <p className="mt-2 text-slate-700">Tu rol no tiene permiso para ver esta sección.</p>
         <Link to="/" className="mt-4 inline-block text-marca underline">
           Volver al inicio

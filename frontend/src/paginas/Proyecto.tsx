@@ -89,7 +89,7 @@ function EjemploNota() {
           <p className="text-sm text-white/70">Nota calculada por el backend</p>
           <p className="mt-1 text-sm tabular-nums text-white/80">{operacion} =</p>
         </div>
-        <p aria-live="polite" className="font-serif text-5xl font-semibold leading-none tabular-nums">
+        <p aria-live="polite" className="font-display text-5xl font-semibold leading-none tabular-nums">
           <span className="text-resaltador">{formato(nota)}</span>
           <span className="ml-1 text-xl text-white/50">/ 5,0</span>
         </p>
@@ -124,7 +124,7 @@ function Foto() {
 function Seccion({ id, titulo, children }: { id: string; titulo: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="grid gap-6 border-t border-slate-200 pt-10 lg:grid-cols-[13rem_1fr] lg:gap-10">
-      <h2 id={id} className="font-serif text-2xl font-semibold leading-tight text-tinta">
+      <h2 id={id} className="font-display text-2xl font-semibold leading-tight text-tinta">
         {titulo}
       </h2>
       <div>{children}</div>
@@ -140,7 +140,7 @@ export default function Proyecto() {
       <section className="grid items-center gap-10 xl:grid-cols-[1fr_27rem] xl:gap-14">
         <div>
           <p className="text-[0.95rem] font-medium text-acento">Proyecto final de Inteligencia Artificial, Universidad de Manizales</p>
-          <h1 className="mt-3 font-serif text-[2.6rem] font-semibold leading-[1.08] text-tinta sm:text-[3.2rem]">
+          <h1 className="mt-3 font-display text-[2.6rem] font-semibold leading-[1.08] text-tinta sm:text-[3.2rem]">
             Asesor Pedagógico Inteligente
           </h1>
           <p className="mt-5 max-w-[36rem] text-lg leading-relaxed text-slate-700">
@@ -195,7 +195,7 @@ export default function Proyecto() {
               <li key={t} className="relative pl-11">
                 <span
                   aria-hidden="true"
-                  className={`absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full font-serif text-sm font-semibold ${
+                  className={`absolute left-0 top-0 flex h-8 w-8 items-center justify-center rounded-full font-display text-sm font-semibold ${
                     i === 3 ? 'bg-resaltador text-pizarra' : 'bg-marca-claro text-pizarra'
                   }`}
                 >
@@ -244,7 +244,7 @@ export default function Proyecto() {
           <article className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
             <Foto />
             <div>
-              <h3 className="font-serif text-xl font-semibold text-tinta">Juan Diego Varón Valencia</h3>
+              <h3 className="font-display text-xl font-semibold text-tinta">Juan Diego Varón Valencia</h3>
               <p className="text-slate-700">Ingeniero de software full-stack e IA</p>
               <p className="mt-2 max-w-md text-sm text-slate-600">
                 Diseñó, dirigió y verificó el desarrollo con agentes de IA: requisitos, arquitectura, código, pruebas y despliegue.

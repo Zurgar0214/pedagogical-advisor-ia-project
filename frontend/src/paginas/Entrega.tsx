@@ -261,7 +261,7 @@ export default function Entrega() {
     <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
       <Link to="/portafolio" className="text-sm text-marca underline">← Portafolio</Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">
+        <h1 className="font-display text-[1.95rem] font-semibold leading-tight text-tinta">
           {entrega.laboratorio.codigo} · {entrega.laboratorio.titulo}
         </h1>
         <Insignia tono={TONO_ESTADO[entrega.estado]}>{ETIQUETA_ESTADO[entrega.estado]}</Insignia>

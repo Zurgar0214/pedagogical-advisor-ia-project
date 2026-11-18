@@ -2,8 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
-import '@fontsource-variable/literata/opsz.css'
-import '@fontsource-variable/atkinson-hyperlegible-next/wght.css'
+import '@fontsource-variable/bricolage-grotesque/opsz.css'
+import '@fontsource-variable/geist/wght.css'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(

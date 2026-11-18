@@ -42,7 +42,7 @@ export default function Login() {
   return (
     <section className="mx-auto grid max-w-5xl gap-10 px-4 py-12 lg:grid-cols-[1fr_25rem] lg:items-center lg:gap-16 lg:px-10 lg:py-20">
       <div className="order-2 lg:order-1">
-        <h1 className="font-serif text-[2.2rem] font-semibold leading-tight text-tinta">Iniciar sesión</h1>
+        <h1 className="font-display text-[2.2rem] font-semibold leading-tight text-tinta">Iniciar sesión</h1>
         <p className="mt-3 max-w-md text-lg leading-relaxed text-slate-700">
           Entra con la cuenta que te asignó el administrador para ver tu portafolio, revisar evaluaciones o consultar informes.
         </p>

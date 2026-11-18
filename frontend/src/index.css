@@ -6,8 +6,8 @@
  * La escala de grises de Tailwind (slate) se remapea a grafitos con matiz verde para que toda la app la herede.
  */
 @theme {
-  --font-sans: "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
-  --font-serif: "Literata Variable", Georgia, "Times New Roman", serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
 
   --color-pizarra: #17332e;
   --color-pizarra-claro: #234a42;
@@ -51,9 +51,9 @@ h3 {
   text-wrap: balance;
 }
 
-.font-serif {
+.font-display {
   font-optical-sizing: auto;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 ::selection {
