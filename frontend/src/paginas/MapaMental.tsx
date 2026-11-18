@@ -45,7 +45,7 @@ function NodoMapaVista({ data, selected }: NodeProps<NodoRF>) {
   const promedio = nodo.datos.promedio
   return (
     <div
-      className="rounded-lg px-3 py-2 text-left shadow-sm"
+      className="rounded-lg px-3 py-2 text-left"
       style={{
         width: ANCHO_NODO[nodo.tipo],
         backgroundColor: esLab ? '#ffffff' : d.fondo,
@@ -59,7 +59,7 @@ function NodoMapaVista({ data, selected }: NodeProps<NodoRF>) {
       <Handle type="source" position={Position.Right} id="out" style={ocultar} />
       <Handle type="source" position={Position.Right} id="rs" style={{ ...ocultar, top: '25%' }} />
       <Handle type="target" position={Position.Right} id="rt" style={{ ...ocultar, top: '75%' }} />
-      <p className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{ETIQUETA_TIPO[nodo.tipo]}</p>
+      <p className="text-[10px] font-semibold opacity-80">{ETIQUETA_TIPO[nodo.tipo]}</p>
       <p className={`leading-tight ${nodo.tipo === 'raiz' ? 'text-base font-bold' : 'text-sm font-semibold'}`} style={{ overflowWrap: 'anywhere' }}>
         {nodo.etiqueta}
       </p>
@@ -223,7 +223,7 @@ function PanelNodo({ mapa, nodo, ir }: { mapa: Mapa; nodo: NodoMapa | null; ir: 
 
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">{ETIQUETA_TIPO[nodo.tipo]}</p>
+      <p className="text-xs font-semibold text-slate-600">{ETIQUETA_TIPO[nodo.tipo]}</p>
       <h3 className="font-serif text-lg font-semibold text-tinta">{nodo.etiqueta}</h3>
       <div className="mt-2">{cuerpo}</div>
     </div>
@@ -570,8 +570,8 @@ function ContenidoMapa({ estudianteId }: { estudianteId: number }) {
 export default function MapaMental() {
   const { esEstudiante, estudiantes, seleccion, setSeleccion, estudianteId, error } = useEstudianteActivo()
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="font-serif text-2xl font-semibold text-tinta">Mapa mental de competencias</h1>
+    <section className="mx-auto max-w-7xl px-4 py-8 lg:px-10 lg:py-10">
+      <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Mapa mental de competencias</h1>
       <p className="mt-1 text-sm text-slate-600">Temas, categorías y laboratorios con el nivel de dominio de cada uno, construido desde el informe.</p>
       {!esEstudiante && (
         <div className="mt-4">

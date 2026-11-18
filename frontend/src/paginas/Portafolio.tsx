@@ -103,8 +103,8 @@ export default function Portafolio() {
   }, [esEstudiante, seleccion])
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-serif text-2xl font-semibold text-tinta">Portafolio</h1>
+    <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
+      <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Portafolio</h1>
       <p className="mt-1 text-sm text-slate-600">Laboratorios de las cohortes 1 y 2 y el estado de cada entrega.</p>
 
       {!esEstudiante && (

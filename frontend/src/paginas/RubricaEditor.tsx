@@ -204,10 +204,10 @@ export default function RubricaEditor() {
     document.getElementById('editor-rubrica')?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  if (!Number.isInteger(labId)) return <p className="mx-auto max-w-6xl px-4 py-8 text-red-800">Laboratorio no válido.</p>
-  if (cargando) return <p role="status" className="mx-auto max-w-6xl px-4 py-8 text-slate-600">Cargando rúbrica…</p>
+  if (!Number.isInteger(labId)) return <p className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10 text-red-800">Laboratorio no válido.</p>
+  if (cargando) return <p role="status" className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10 text-slate-600">Cargando rúbrica…</p>
   if (error || !contenido) return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
+    <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
       <Aviso tipo="error">{error ?? 'No se pudo cargar la rúbrica.'}</Aviso>
       <Link to="/laboratorios" className="mt-4 inline-block text-marca underline">Volver a laboratorios</Link>
     </section>
@@ -216,9 +216,9 @@ export default function RubricaEditor() {
   const compIds = contenido.competencias.map((c) => c.id)
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
+    <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
       <Link to="/laboratorios" className="text-sm text-marca underline">← Laboratorios</Link>
-      <h1 className="mt-2 font-serif text-2xl font-semibold text-tinta">Rúbrica de {lab ? `${lab.codigo} · ${lab.titulo}` : 'laboratorio'}</h1>
+      <h1 className="mt-2 font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Rúbrica de {lab ? `${lab.codigo} · ${lab.titulo}` : 'laboratorio'}</h1>
       <p className="mt-1 text-sm text-slate-600">
         {baseNumero ? `Editando a partir de la versión ${baseNumero}.` : 'Aún no hay versiones; se parte de una plantilla inicial.'} Guardar siempre crea una versión nueva.
       </p>

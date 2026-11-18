@@ -30,8 +30,8 @@ export default function Revision() {
   const items = !cargando && lista ? lista.items : []
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-serif text-2xl font-semibold text-tinta">Revisión docente</h1>
+    <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
+      <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Revisión docente</h1>
       <p className="mt-1 text-sm text-slate-600">Evaluaciones generadas con IA pendientes de revisión, aprobación o publicación.</p>
 
       <div className="mt-4 max-w-xs">
@@ -56,7 +56,7 @@ export default function Revision() {
         <div className={`${tarjeta} mt-4 overflow-x-auto p-0`}>
           <table className="w-full text-left text-sm">
             <caption className="sr-only">Evaluaciones en estado {ETIQUETA_EVAL[estado]}</caption>
-            <thead className="bg-slate-100 text-xs uppercase text-slate-700">
+            <thead className="bg-slate-100 text-xs text-slate-700">
               <tr>
                 <th scope="col" className="px-3 py-2">Estudiante</th>
                 <th scope="col" className="px-3 py-2">Laboratorio</th>

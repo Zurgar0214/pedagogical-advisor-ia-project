@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 import app.models  # noqa: F401
+from app.core.limitador import limitador_login
 from app.core.seguridad import hashear_contrasena
 from app.db.session import Base, get_db
 from app.main import app
@@ -41,6 +42,13 @@ def rubrica_valida() -> Rubrica:
 # ---- Base de datos y cliente HTTP para pruebas de la API (SQLite en memoria) ----
 
 CONTRASENA = "clave-segura-1"
+
+
+@pytest.fixture(autouse=True)
+def _limitador_limpio():
+    limitador_login.reiniciar()
+    yield
+    limitador_login.reiniciar()
 
 
 @pytest.fixture

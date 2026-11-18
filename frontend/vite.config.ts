@@ -6,7 +6,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      '/api': { target: 'http://localhost:8000', changeOrigin: true },
+      // API_PROXY permite apuntar al stack de Docker (p. ej. http://localhost:8080)
+      '/api': { target: process.env.API_PROXY ?? 'http://localhost:8000', changeOrigin: true },
     },
   },
 })

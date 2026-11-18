@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     sandbox_url: str = ""
     sandbox_token: str = ""
     sandbox_timeout_s: int = 60
+    # Límite de intentos de inicio de sesión fallidos por correo (fuerza bruta)
+    login_max_intentos: int = 5
+    login_ventana_s: int = 900
+    login_bloqueo_s: int = 300
     admin_correo: str | None = None
     admin_contrasena: str | None = None
 

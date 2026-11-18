@@ -39,7 +39,7 @@ function Seccion({ id, titulo, children }: { id: string; titulo: string; childre
 function Cifra({ etiqueta, children }: { etiqueta: string; children: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">{etiqueta}</p>
+      <p className="text-xs font-semibold text-slate-600">{etiqueta}</p>
       <div className="mt-1 text-tinta">{children}</div>
     </div>
   )
@@ -362,8 +362,8 @@ export default function Informe() {
   const { esEstudiante, estudiantes, seleccion, setSeleccion, estudianteId, error } = useEstudianteActivo()
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-serif text-2xl font-semibold text-tinta">Informe integral</h1>
+    <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
+      <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Informe integral</h1>
       <p className="mt-1 text-sm text-slate-600">Resumen del aprendizaje a lo largo de las cohortes 1 y 2, descargable en PDF.</p>
 
       {!esEstudiante && (

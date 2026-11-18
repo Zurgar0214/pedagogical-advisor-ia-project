@@ -2,12 +2,12 @@ import type { ReactNode } from 'react'
 
 export function Aviso({ tipo, children }: { tipo: 'ok' | 'error' | 'advertencia'; children: ReactNode }) {
   const estilos = {
-    ok: 'border-emerald-300 bg-emerald-50 text-emerald-900',
-    error: 'border-red-300 bg-red-50 text-red-800',
-    advertencia: 'border-amber-300 bg-amber-50 text-amber-900',
+    ok: 'border-emerald-600 bg-emerald-50 text-emerald-900',
+    error: 'border-red-600 bg-red-50 text-red-900',
+    advertencia: 'border-amber-500 bg-amber-50 text-amber-950',
   }[tipo]
   return (
-    <div role={tipo === 'error' ? 'alert' : 'status'} className={`rounded border px-3 py-2 text-sm ${estilos}`}>
+    <div role={tipo === 'error' ? 'alert' : 'status'} className={`rounded-md border-l-4 px-3.5 py-2.5 text-sm ${estilos}`}>
       {children}
     </div>
   )
@@ -18,9 +18,9 @@ export function Insignia({ tono, children }: { tono: 'verde' | 'rojo' | 'gris' |
     verde: 'bg-emerald-100 text-emerald-900',
     rojo: 'bg-red-100 text-red-900',
     gris: 'bg-slate-200 text-slate-800',
-    azul: 'bg-blue-100 text-blue-900',
+    azul: 'bg-marca-claro text-pizarra',
     ambar: 'bg-amber-100 text-amber-900',
   }[tono]
-  return <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${estilos}`}>{children}</span>
+  return <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${estilos}`}>{children}</span>
 }
 

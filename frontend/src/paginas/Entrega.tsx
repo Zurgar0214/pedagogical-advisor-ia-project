@@ -211,11 +211,11 @@ export default function Entrega() {
     }
   }, [entregaId])
 
-  if (!Number.isInteger(entregaId)) return <p className="mx-auto max-w-6xl px-4 py-8 text-red-800">Entrega no válida.</p>
-  if (cargando) return <p role="status" className="mx-auto max-w-6xl px-4 py-8 text-slate-600">Cargando entrega…</p>
+  if (!Number.isInteger(entregaId)) return <p className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10 text-red-800">Entrega no válida.</p>
+  if (cargando) return <p role="status" className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10 text-slate-600">Cargando entrega…</p>
   if (error || !entrega) {
     return (
-      <section className="mx-auto max-w-6xl px-4 py-8">
+      <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
         <Aviso tipo="error">{error ?? 'No se pudo cargar la entrega.'}</Aviso>
         <Link to="/portafolio" className="mt-4 inline-block text-marca underline">Volver al portafolio</Link>
       </section>
@@ -258,10 +258,10 @@ export default function Entrega() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
+    <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
       <Link to="/portafolio" className="text-sm text-marca underline">← Portafolio</Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h1 className="font-serif text-2xl font-semibold text-tinta">
+        <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">
           {entrega.laboratorio.codigo} · {entrega.laboratorio.titulo}
         </h1>
         <Insignia tono={TONO_ESTADO[entrega.estado]}>{ETIQUETA_ESTADO[entrega.estado]}</Insignia>

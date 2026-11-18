@@ -57,5 +57,6 @@ cd backend && python -m pytest -q
 - [Arquitectura y decisiones](docs/ARQUITECTURA.md)
 - [Contrato de la API](docs/API.md)
 - [Despliegue (Azure / Oracle)](docs/DESPLIEGUE.md)
+- [Seguridad y uso responsable de la IA](docs/SEGURIDAD_E_IA_RESPONSABLE.md)
 - [Bitácora de uso de IA](docs/BITACORA_IA.md)
 - [Cómo se trabajó con agentes de IA](docs/HARNESS.md)

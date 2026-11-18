@@ -119,8 +119,8 @@ export default function Usuarios() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-serif text-2xl font-semibold text-tinta">Gestión de usuarios</h1>
+    <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
+      <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">Gestión de usuarios</h1>
       <p className="mt-1 text-sm text-slate-600">Crea cuentas, asigna roles y controla el acceso a la plataforma.</p>
 
       <div aria-live="polite">
@@ -137,7 +137,7 @@ export default function Usuarios() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_20rem]">
-        <div className="min-w-0 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="min-w-0 rounded-lg border border-slate-200 bg-white p-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <h2 className="text-lg font-semibold text-tinta">Usuarios</h2>
             <div>
@@ -288,7 +288,7 @@ export default function Usuarios() {
           )}
         </div>
 
-        <form onSubmit={crear} noValidate className="h-fit space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="titulo-crear">
+        <form onSubmit={crear} noValidate className="h-fit space-y-4 rounded-lg border border-slate-200 bg-white p-4" aria-labelledby="titulo-crear">
           <h2 id="titulo-crear" className="text-lg font-semibold text-tinta">
             Crear usuario
           </h2>

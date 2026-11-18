@@ -34,7 +34,7 @@ function Lista({ titulo, items, tono }: { titulo: string; items: string[]; tono?
 function Nota({ etiqueta, valor, destacada }: { etiqueta: string; valor: number | null | undefined; destacada?: boolean }) {
   return (
     <div className={`rounded-lg border px-4 py-3 text-center ${destacada ? 'border-marca bg-blue-50' : 'border-slate-200 bg-slate-50'}`}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">{etiqueta}</p>
+      <p className="text-xs font-semibold text-slate-600">{etiqueta}</p>
       <p className={`font-serif font-semibold text-tinta ${destacada ? 'text-4xl' : 'text-3xl'}`}>
         {formatoNota(valor)} <span className="text-sm font-normal text-slate-600">/ 5,0</span>
       </p>
@@ -163,7 +163,7 @@ function TablaHallazgos({ titulo, filas }: { titulo: string; filas: HallazgoCodi
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
         <caption className="pb-1 text-left text-sm font-semibold text-slate-800">{titulo} ({filas.length})</caption>
-        <thead className="bg-slate-100 text-xs uppercase text-slate-700">
+        <thead className="bg-slate-100 text-xs text-slate-700">
           <tr>
             <th scope="col" className="px-2 py-1">Archivo</th>
             <th scope="col" className="px-2 py-1">Línea</th>
@@ -259,7 +259,7 @@ function Trazabilidad({ ev }: { ev: Evaluacion }) {
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <caption className="sr-only">Uso de modelos por llamada</caption>
-          <thead className="bg-slate-100 text-xs uppercase text-slate-700">
+          <thead className="bg-slate-100 text-xs text-slate-700">
             <tr>
               <th scope="col" className="px-2 py-1">Propósito</th>
               <th scope="col" className="px-2 py-1">Modelo</th>
@@ -339,11 +339,11 @@ export default function EvaluacionDetalle() {
     }
   }, [evalId])
 
-  if (!Number.isInteger(evalId)) return <p className="mx-auto max-w-6xl px-4 py-8 text-red-800">Evaluación no válida.</p>
-  if (cargando) return <p role="status" className="mx-auto max-w-6xl px-4 py-8 text-slate-600">Cargando evaluación…</p>
+  if (!Number.isInteger(evalId)) return <p className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10 text-red-800">Evaluación no válida.</p>
+  if (cargando) return <p role="status" className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10 text-slate-600">Cargando evaluación…</p>
   if (error || !ev) {
     return (
-      <section className="mx-auto max-w-6xl px-4 py-8">
+      <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
         <Aviso tipo="error">{error ?? 'No se pudo cargar la evaluación.'}</Aviso>
         <Link to={esDocente ? '/revision' : '/portafolio'} className="mt-4 inline-block text-marca underline">Volver</Link>
       </section>
@@ -376,12 +376,12 @@ export default function EvaluacionDetalle() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
+    <section className="mx-auto max-w-6xl px-4 py-8 lg:px-10 lg:py-10">
       <Link to={esDocente ? '/revision' : `/entregas/${ev.entrega_id}`} className="text-sm text-marca underline">
         {esDocente ? '← Revisión docente' : '← Mi entrega'}
       </Link>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <h1 className="font-serif text-2xl font-semibold text-tinta">
+        <h1 className="font-serif text-[1.95rem] font-semibold leading-tight text-tinta">
           {esDocente ? 'Evaluación' : 'Retroalimentación'} · {ev.laboratorio.codigo} {ev.laboratorio.titulo}
         </h1>
         <Insignia tono={TONO_EVAL[ev.estado]}>{ETIQUETA_EVAL[ev.estado]}</Insignia>
