@@ -15,7 +15,7 @@ import { ETIQUETA_ESTADO, ETIQUETA_FALTANTE, TONO_ESTADO } from './estadoEntrega
 
 function Tarjeta({ item, estudianteId, esEstudiante }: { item: EntradaPortafolio; estudianteId: number; esEstudiante: boolean }) {
   const navegar = useNavigate()
-  const [creando, setCreando] = useState(esEstudiante)
+  const [creando, setCreando] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { laboratorio: lab, entrega } = item
   const r = lab.rubrica_vigente
